@@ -26,7 +26,13 @@ public class ControladorDeJogo {
     /** @pdRoleInfo migr=no name=Ficheiros assc=association16 mult=0..1 */
     public Ficheiros ficheiros;
 
+    public void ControladorDeJogo() {
+        // TODO: implement
+        this.mundo=new Mundo();
+    }
+    
     /** @pdOid 8a29e47a-dd73-4a0d-a56f-9206850587c4 */
+    
     public void iniciarJogo() {
         // TODO: implement
     }

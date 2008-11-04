@@ -6,12 +6,13 @@
 
 package dei.es2008;
 
+import java.awt.Color;
 import java.util.*;
 
 /** @pdOid 57eceda6-9a90-4a28-a307-5068d2611aec */
 public class Mundo {
    /** @pdOid 1930c0ed-cfa2-4350-838b-b0cc41bb0106 */
-   private int[][] mundo;
+   private Color[][] mundo;
    /** @pdOid 82e42fd5-a340-4160-adda-750ebefe7409 */
    private int pontuacao;
    /** @pdOid 5d5a055b-5faf-41be-aaaf-01bc4decee64 */
@@ -23,8 +24,23 @@ public class Mundo {
    private Peca peca;
    
    /** @pdOid 062af6de-82ba-4a79-b5c3-52f9cf8d65cd */
+   
+   public Mundo(int width, int height) {
+        
+        this.mundo= new Color [height][width];
+        this.pontuacao=0;
+        
+    }
+   public Mundo() {
+        //ver valores que meti
+        this.mundo= new Color [10][30];
+        this.pontuacao=0;
+        
+    }
+
    private void fundePeca() {
       // TODO: implement
+       
    }
    
    /** @pdOid 9f0aea09-9310-488a-adff-645bb653980b */
