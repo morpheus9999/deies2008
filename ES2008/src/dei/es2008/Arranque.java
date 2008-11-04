@@ -17,11 +17,14 @@ public class Arranque {
    /** @pdOid 189e9a60-f76d-4ef9-9180-a345a16d7b20 */
    public void main() {
       // TODO: implement
+       runGUI();
+       
    }
    
    /** @pdOid c2bdda6b-e752-42a1-9f18-b5edca54a237 */
    public void runGUI() {
       // TODO: implement
+       this.gui= new Gui();
    }
    
    /** @pdOid d04ab356-96b0-4d73-a2dd-a7cc2ee3570b */
