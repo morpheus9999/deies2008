@@ -8,7 +8,11 @@ package dei.es2008;
 
 import java.util.*;
 
-/** @pdOid 1567cd92-977c-4b41-8c93-b1cba1423f7b */
+/** @pdOid 1567cd92-977c-4b41-8c93-b1cba1423f7b 
+ 
+ 
+ 
+ */
 public class Arranque {
    /** @pdRoleInfo migr=no name=Gui assc=association1 mult=1..1 */
    public Gui gui;
