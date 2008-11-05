@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.InputStream;
 import java.util.*;
 import java.util.prefs.Preferences;
 import javax.swing.JButton;
@@ -25,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListModel;
+
 
 /** @pdOid 91d1597c-405b-464d-92c1-2f6649512fa8 */
 public class Gui {
@@ -36,6 +38,7 @@ public class Gui {
    private Peca nextFigure = null;
    private boolean moveLock = false;
    private int nextRotation = 0;
+   private boolean isApplet;
    /**
      * The figure preview flag. If this flag is set, the figure
      * will be shown in the figure preview board.
@@ -62,6 +65,37 @@ public class Gui {
     private Mundo mundoAnterior = new Mundo(5, 5);
     private GameThread thread = null;
    
+    
+    public Gui (boolean isApplet) {
+        this(12, 25);
+		this.isApplet = isApplet;
+
+		//highScore = new HighScore();
+
+		if (isApplet) {
+			try {
+//				InputStream is = appContext.getStream("highScores");
+//				BufferedReader br = new BufferedReader(new InputStreamReader(is));
+//				highScore.setSerializedScores(br.readLine());
+//				br.close();
+//				is.close();
+			} catch (Exception ex) {
+				System.err.println("can't load high score: " + ex.getMessage());
+			}
+		} else {
+			prefRoot = Preferences.userNodeForPackage(Gui.class);
+			String hs = prefRoot.get("highScores", null);
+			if (hs != null)
+				//highScore.setSerializedScores(hs);
+			showPreview = prefRoot.getBoolean("showPreview", true);
+		}
+    }
+    
+    public Gui (int width, int height) {
+        mundo = new Mundo(width, height);
+        mundo.setMessage("Press start");
+        thread = new GameThread();
+    }
    public void Gui(){
         
         //Meter a seguir qualquer coisa para iniciar
@@ -120,14 +154,14 @@ public class Gui {
      * label and adjust the thread speed.
      */
     private void handleLevelModification() {
-        component.levelLabel.setText("Level: " + level);
+        component.levelLabel.setText("Level: " + mundo.getNivel());
         thread.adjustSpeed();
     }
     /**
      * Handle a score modification event. This will modify the score label.
      */
     private void handleScoreModification() {
-        component.scoreLabel.setText("Score: " + score);
+        component.scoreLabel.setText("Score: " + mundo.score);
     }
    private void handleStart() {
 
@@ -169,9 +203,9 @@ public class Gui {
         if (figure.isAllVisible()) {
 			// 10 points per level if a figure has been dropped
 			if (figure.numRowsFallen() > 0)
-				score += mundo.getNivel() * 10;
+				mundo.score += mundo.getNivel() * 10;
 			// ... and some extra points for each row of height
-            score += mundo.getNivel() * figure.numRowsFallen();
+            mundo.score += mundo.getNivel() * figure.numRowsFallen();
         } else {
             handleGameOver();
             return;
@@ -181,7 +215,7 @@ public class Gui {
 
 		// a few extra points if the preview is turned off
 		if (!showPreview)
-			score += mundo.getNivel();
+			mundo.score += mundo.getNivel();
 
         // Check for full lines or create new figure
 		int fullLines = mundo.getFullLines();
@@ -191,16 +225,16 @@ public class Gui {
 			// 20 more for the second, 30 more for the third, and 40 more for the fourth
 			switch (fullLines) {
 				case 1:
-					score += mundo.getNivel() * 10;
+					mundo.score += mundo.getNivel() * 10;
 					break;
 				case 2:
-					score += mundo.getNivel() * 30;
+					mundo.score += mundo.getNivel() * 30;
 					break;
 				case 3:
-					score += mundo.getNivel() * 60;
+					mundo.score += mundo.getNivel() * 60;
 					break;
 				case 4:
-					score += mundo.getNivel() * 100;
+					mundo.score += mundo.getNivel() * 100;
 					break;
 			}
             if (mundo.getNivel() < 9 && mundo.getRemovedLines() / 20 > mundo.getNivel()) {
@@ -287,7 +321,7 @@ public class Gui {
         mundo.setMessage("Game Over");
         component.button.setLabel("Start");
 
-		handleHighScoreModification();
+		//handleHighScoreModification();
 
 		if (! isApplet) try {
 			prefRoot.putBoolean("showPreview", showPreview);
@@ -305,6 +339,26 @@ public class Gui {
         thread.setPaused(false);
     }
     
+    
+    /**
+     * Handle a high score modification event. This will modify the high score list if necessary.
+     */
+//    private void handleHighScoreModification() {
+//		if (highScore.putScore(score)) {
+//			String hs = highScore.getSerializedScores();
+//			try {
+//				if (isApplet) {
+//					InputStream bais = new ByteArrayInputStream(hs.getBytes());
+//					appContext.setStream("highScores", bais);
+//				} else {
+//					prefRoot.put("highScores", hs);
+//					prefRoot.flush();
+//				}
+//			} catch (Exception ex) {
+//				System.err.println("can't store high score: "+ex.getMessage());
+//			}
+//		}
+//    }
     /**
      * Handles a game pause event. This will pause the game thread and
      * print a pause message on the game board.
