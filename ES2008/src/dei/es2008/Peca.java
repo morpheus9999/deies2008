@@ -1,5 +1,6 @@
 package dei.es2008;
 import java.awt.Color;
+import java.awt.Point;
 
 public class Peca {
 
@@ -12,6 +13,7 @@ public class Peca {
     public static final int T = 7;
 
     private Mundo board = null;
+    private Point[] coordenadasPecas = new Point[4];
     
     private int xPos = 0;
     private int yPos = 0;
@@ -19,9 +21,6 @@ public class Peca {
 
     private int orientation = 0;
     private int maxOrientation = 4;
-
-    private int[] shapeX = new int[4];
-    private int[] shapeY = new int[4];
 
     private Color color = Color.white;
 
@@ -54,90 +53,105 @@ public class Peca {
 
         // Initialize figure type variables
         switch (tipo) {
+            
         case QUADRADO:
             maxOrientation = 1;
             color = new Color(Integer.parseInt("ffd8b1", 16));
-            shapeX[0] = -1;
-            shapeY[0] = 0;
-            shapeX[1] = 0;
-            shapeY[1] = 0;
-            shapeX[2] = -1;
-            shapeY[2] = 1;
-            shapeX[3] = 0;
-            shapeY[3] = 1;
+            
+            coordenadasPecas[0].x = -1;
+            coordenadasPecas[0].y = 0;           
+            coordenadasPecas[1].x = 0;
+            coordenadasPecas[1].y = 0;
+            coordenadasPecas[2].x = -1;
+            coordenadasPecas[2].y = 1;
+            coordenadasPecas[3].x = 0;
+            coordenadasPecas[3].y = 1;            
             break;
+            
         case LINHA:
             maxOrientation = 2;
             color = new Color(Integer.parseInt("ffb4b4", 16));
-            shapeX[0] = -2;
-            shapeY[0] = 0;
-            shapeX[1] = -1;
-            shapeY[1] = 0;
-            shapeX[2] = 0;
-            shapeY[2] = 0;
-            shapeX[3] = 1;
-            shapeY[3] = 0;
+            
+            coordenadasPecas[0].x = -2;
+            coordenadasPecas[0].y = 0;           
+            coordenadasPecas[1].x = -1;
+            coordenadasPecas[1].y = 0;
+            coordenadasPecas[2].x = 0;
+            coordenadasPecas[2].y = 0;
+            coordenadasPecas[3].x = 1;
+            coordenadasPecas[3].y = 0;           
             break;
+            
         case S:
             maxOrientation = 2;
             color = new Color(Integer.parseInt("a3d5ee", 16));
-            shapeX[0] = 0;
-            shapeY[0] = 0;
-            shapeX[1] = 1;
-            shapeY[1] = 0;
-            shapeX[2] = -1;
-            shapeY[2] = 1;
-            shapeX[3] = 0;
-            shapeY[3] = 1;
+                        
+            coordenadasPecas[0].x = 0;
+            coordenadasPecas[0].y = 0;           
+            coordenadasPecas[1].x = 1;
+            coordenadasPecas[1].y = 0;
+            coordenadasPecas[2].x = -1;
+            coordenadasPecas[2].y = 1;
+            coordenadasPecas[3].x = 0;
+            coordenadasPecas[3].y = 1;
             break;
+            
         case S_INVERTIDO:
             maxOrientation = 2;
             color = new Color(Integer.parseInt("f4adff", 16));
-            shapeX[0] = -1;
-            shapeY[0] = 0;
-            shapeX[1] = 0;
-            shapeY[1] = 0;
-            shapeX[2] = 0;
-            shapeY[2] = 1;
-            shapeX[3] = 1;
-            shapeY[3] = 1;
+            
+            coordenadasPecas[0].x = -1;
+            coordenadasPecas[0].y = 0;           
+            coordenadasPecas[1].x = 0;
+            coordenadasPecas[1].y = 0;
+            coordenadasPecas[2].x = 0;
+            coordenadasPecas[2].y = 1;
+            coordenadasPecas[3].x = 1;
+            coordenadasPecas[3].y = 1;            
             break;
+            
         case L:
             maxOrientation = 4;
             color = new Color(Integer.parseInt("c0b6fa", 16));
-            shapeX[0] = -1;
-            shapeY[0] = 0;
-            shapeX[1] = 0;
-            shapeY[1] = 0;
-            shapeX[2] = 1;
-            shapeY[2] = 0;
-            shapeX[3] = 1;
-            shapeY[3] = 1;
+            
+            coordenadasPecas[0].x = -1;
+            coordenadasPecas[0].y = 0;           
+            coordenadasPecas[1].x = 0;
+            coordenadasPecas[1].y = 0;
+            coordenadasPecas[2].x = 1;
+            coordenadasPecas[2].y = 0;
+            coordenadasPecas[3].x = 1;
+            coordenadasPecas[3].y = 1;
             break;
+            
         case L_INVERTIDO:
             maxOrientation = 4;
             color = new Color(Integer.parseInt("f5f4a7", 16));
-            shapeX[0] = -1;
-            shapeY[0] = 0;
-            shapeX[1] = 0;
-            shapeY[1] = 0;
-            shapeX[2] = 1;
-            shapeY[2] = 0;
-            shapeX[3] = -1;
-            shapeY[3] = 1;
+            
+            coordenadasPecas[0].x = -1;
+            coordenadasPecas[0].y = 0;           
+            coordenadasPecas[1].x = 0;
+            coordenadasPecas[1].y = 0;
+            coordenadasPecas[2].x = 1;
+            coordenadasPecas[2].y = 0;
+            coordenadasPecas[3].x = -1;
+            coordenadasPecas[3].y = 1;
             break;
+            
         case T:
             maxOrientation = 4;
             color = new Color(Integer.parseInt("a4d9b6", 16));
-            shapeX[0] = -1;
-            shapeY[0] = 0;
-            shapeX[1] = 0;
-            shapeY[1] = 0;
-            shapeX[2] = 1;
-            shapeY[2] = 0;
-            shapeX[3] = 0;
-            shapeY[3] = 1;
+            
+            coordenadasPecas[0].x = -1;
+            coordenadasPecas[0].y = 0;           
+            coordenadasPecas[1].x = 0;
+            coordenadasPecas[1].y = 0;
+            coordenadasPecas[2].x = 1;
+            coordenadasPecas[2].y = 0;
+            coordenadasPecas[3].x = 0;
+            coordenadasPecas[3].y = 1;
             break;
+            
         default :
             throw new IllegalArgumentException("No figure constant: " + tipo);
         }
@@ -197,7 +211,7 @@ public class Peca {
             newY = board.getBoardHeight() / 2;
         } else {
             newY = 0;
-            for (i = 0; i < shapeX.length; i++) {
+            for (i = 0; i < coordenadasPecas.length; i++) {
                 if (getRelativeY(i, orientation) - newY > 0) {
                     newY = -getRelativeY(i, orientation);
                 }
@@ -238,7 +252,7 @@ public class Peca {
         if (!isAttached()) {
             return false;
         }
-        for (int i = 0; i < shapeX.length; i++) {
+         for (int i = 0; i < coordenadasPecas.length; i++) {
             if (yPos + getRelativeY(i, orientation) < 0) {
                 return false;
             }
@@ -423,7 +437,7 @@ public class Peca {
      * @return true if the coordinates are inside the figure, or false otherwise
      */
     private boolean isInside(int x, int y) {
-        for (int i = 0; i < shapeX.length; i++) {
+        for (int i = 0; i < coordenadasPecas.length; i++) {
             if (x == xPos + getRelativeX(i, orientation)
              && y == yPos + getRelativeY(i, orientation)) {
 
@@ -470,13 +484,13 @@ public class Peca {
     private int getRelativeX(int square, int orientation) {
         switch (orientation % 4) {
         case 0 :
-            return shapeX[square];
+            return coordenadasPecas[square].x;
         case 1 :
-            return -shapeY[square];
+            return -coordenadasPecas[square].y;
         case 2 :
-            return -shapeX[square];
+            return -coordenadasPecas[square].x;
         case 3 :
-            return shapeY[square];
+            return coordenadasPecas[square].y;
         default:
             return 0; // Should never occur
         }
@@ -494,13 +508,13 @@ public class Peca {
     private int getRelativeY(int square, int orientation) {
         switch (orientation % 4) {
         case 0 :
-            return shapeY[square];
+            return coordenadasPecas[square].y;
         case 1 :
-            return shapeX[square];
+            return coordenadasPecas[square].x;
         case 2 :
-            return -shapeY[square];
+            return -coordenadasPecas[square].y;
         case 3 :
-            return -shapeX[square];
+            return -coordenadasPecas[square].x;
         default:
             return 0; // Should never occur
         }
@@ -514,7 +528,7 @@ public class Peca {
     private void paint(Color color) {
         int x, y;
 
-        for (int i = 0; i < shapeX.length; i++) {
+        for (int i = 0; i < coordenadasPecas.length; i++) {
             x = xPos + getRelativeX(i, orientation);
             y = yPos + getRelativeY(i, orientation);
             board.setSquareColor(x, y, color);
