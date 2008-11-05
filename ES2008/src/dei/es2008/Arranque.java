@@ -12,11 +12,11 @@ import javax.swing.JFrame;
  */
 public class Arranque extends Applet {
 
-    private Gui game = null;
+    private ControladorDeJogo game = null;
     
     public static void main (String[] args) {
         JFrame frame = new JFrame("Tetris");
-        Gui game = new Gui(false);
+        ControladorDeJogo game = new ControladorDeJogo(false);
         frame.add(game.getComponente());
         frame.pack();
         frame.addWindowListener(new WindowAdapter() {
@@ -50,7 +50,7 @@ public class Arranque extends Applet {
      */
     public void init() {
         
-        game = new Gui(true);
+        game = new ControladorDeJogo(true);
 		game.setAppletContext(getAppletContext());
       
         setLayout(new BorderLayout());
