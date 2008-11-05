@@ -142,7 +142,7 @@ public class Gui {
 
 		if (isApplet) {
 			try {
-				InputStream is = appContext.getStream("highScores");
+				InputStream is = appContext.getStream("Ranking");
 				BufferedReader br = new BufferedReader(new InputStreamReader(is));
 				highScore.setSerializedScores(br.readLine());
 				br.close();
@@ -152,10 +152,10 @@ public class Gui {
 			}
 		} else {
 			prefRoot = Preferences.userNodeForPackage(Gui.class);
-			String hs = prefRoot.get("highScores", null);
+			String hs = prefRoot.get("", null);
 			if (hs != null)
 				highScore.setSerializedScores(hs);
-			showPreview = prefRoot.getBoolean("showPreview", true);
+			showPreview = prefRoot.getBoolean("ver peça seguinte", true);
 		}
     }
 
@@ -167,7 +167,7 @@ public class Gui {
      */
     public Gui (int width, int height) {
         board = new Mundo(width, height);
-        board.setMessage("Press start");
+        board.setMessage("Iniciar");
         thread = new GameThread();
     }
 
@@ -211,7 +211,7 @@ public class Gui {
         score = 0;
         figure = null;
         nextFigure = randomFigure();
-        nextFigure.rotateRandom();
+        nextFigure.rotacaoRandom();
         nextRotation = nextFigure.getRotation();  
 
         // Reset components
@@ -220,7 +220,7 @@ public class Gui {
         previewBoard.clear();
         handleLevelModification();
         handleScoreModification();
-        component.button.setLabel("Pause");
+        component.button.setLabel("Pausa");
 
         // Start game thread
         thread.reset();
@@ -247,12 +247,12 @@ public class Gui {
 
         // Handle components
         board.setMessage("Game Over");
-        component.button.setLabel("Start");
+        component.button.setLabel("Iniciar");
 
 		handleHighScoreModification();
 
 		if (! isApplet) try {
-			prefRoot.putBoolean("showPreview", showPreview);
+			prefRoot.putBoolean("ver peça seguinte", showPreview);
 			prefRoot.flush();
 		} catch (Exception ex) { }
     }
@@ -263,8 +263,8 @@ public class Gui {
      */
     private void handlePause() {
         thread.setPaused(true);
-        board.setMessage("Paused");
-        component.button.setLabel("Resume");
+        board.setMessage("Pausado");
+        component.button.setLabel("Retomar Jogo");
     }
 
     /**
@@ -273,7 +273,7 @@ public class Gui {
      */
     private void handleResume() {
         board.setMessage(null);
-        component.button.setLabel("Pause");
+        component.button.setLabel("Pausar");
         thread.setPaused(false);
     }
 
@@ -282,7 +282,7 @@ public class Gui {
      * label and adjust the thread speed.
      */
     private void handleLevelModification() {
-        component.levelLabel.setText("Level: " + level);
+        component.levelLabel.setText("Nível: " + level);
         thread.adjustSpeed();
     }
     
@@ -290,7 +290,7 @@ public class Gui {
      * Handle a score modification event. This will modify the score label.
      */
     private void handleScoreModification() {
-        component.scoreLabel.setText("Score: " + score);
+        component.scoreLabel.setText("Pontuação: " + score);
     }
  
     /**
@@ -302,13 +302,13 @@ public class Gui {
 			try {
 				if (isApplet) {
 					InputStream bais = new ByteArrayInputStream(hs.getBytes());
-					appContext.setStream("highScores", bais);
+					appContext.setStream("", bais);
 				} else {
-					prefRoot.put("highScores", hs);
+					prefRoot.put("", hs);
 					prefRoot.flush();
 				}
 			} catch (Exception ex) {
-				System.err.println("can't store high score: "+ex.getMessage());
+				System.err.println("Impossível guardar a pontuação: "+ex.getMessage());
 			}
 		}
     }
@@ -328,7 +328,7 @@ public class Gui {
         moveLock = false;
         rotation = nextRotation;
         nextFigure = randomFigure();
-        nextFigure.rotateRandom(); 
+        nextFigure.rotacaoRandom(); 
         nextRotation = nextFigure.getRotation(); 
 
         // Handle figure preview
@@ -339,7 +339,7 @@ public class Gui {
         }
 
         // Attach figure to game board
-        figure.setRotation(rotation);
+        figure.setRotacao(rotation);
         if (!figure.attach(board, false)) {
             previewBoard.clear();
             figure.attach(previewBoard, true);
@@ -471,13 +471,13 @@ public class Gui {
             break;
             
         case KeyEvent.VK_SPACE:
-            figure.rotateClockwise();
+            figure.rotacao();
             //figure.moveAllWayDown();
             //moveLock = true;
             break;
 
         case KeyEvent.VK_UP:
-			figure.rotateClockwise();
+			figure.rotacao();
 			break;
 
         case KeyEvent.VK_DOWN:
@@ -615,12 +615,12 @@ public class Gui {
         /**
          * The score label.
          */
-        private JLabel scoreLabel = new JLabel("Score: 0");
+        private JLabel scoreLabel = new JLabel("Pontuação: 0");
 
         /**
          * The high score label.
          */
-        private JLabel highScoreLabel = new JLabel("High Scores");
+        private JLabel highScoreLabel = new JLabel("");
 
         /**
          * The list of high scores.
@@ -630,12 +630,12 @@ public class Gui {
         /**
          * The level label.
          */
-        private JLabel levelLabel = new JLabel("Level: 1");
+        private JLabel levelLabel = new JLabel("Nível: 1");
 
         /**
          * The generic button.
          */
-        private JButton button = new JButton("Start");
+        private JButton button = new JButton("Iniciar");
 
         /**
          * Creates a new game panel. All the components will also be added to the panel.

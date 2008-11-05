@@ -12,7 +12,7 @@ public class Peca {
     public static final int L_INVERTIDO = 6;
     public static final int T = 7;
 
-    private Mundo board = null;
+    private Mundo mundo = null;
     private Point[] coordenadasPecas ;
     
     private int xPos = 0;
@@ -26,7 +26,7 @@ public class Peca {
 
     public Peca(int tipo) throws IllegalArgumentException {
         coordenadasPecas = new Point[4];
-        initialize(tipo);
+        criaPeca(tipo);
     }
     
     /**
@@ -39,9 +39,9 @@ public class Peca {
      * @see #L_INVERTIDO
      * @see #T   
      */
-    private void initialize(int tipo) throws IllegalArgumentException {
+    private void criaPeca(int tipo) throws IllegalArgumentException {
                 
-        board = null;
+        mundo = null;
         xPos = 0;
         yPos = 0;
         numeroRotacao = 0;
@@ -121,7 +121,7 @@ public class Peca {
      * @return true se a peca ja esta agarrada ao mundo
      */
     public boolean isAttached() {
-        return board != null;
+        return mundo != null;
     }
     /**
      * @return o numero de linhas que a peca fez cair     
@@ -151,7 +151,7 @@ public class Peca {
      * 
      * @return true if the figure could be attached, or false otherwise
      */
-    public boolean attach(Mundo board, boolean center) {
+    public boolean attach(Mundo mundo, boolean center) {
         int  newX;
         int  newY;
         int  i;
@@ -164,9 +164,9 @@ public class Peca {
         xPos = 0;
         yPos = 0;
 
-        newX = board.getBoardWidth() / 2;
+        newX = mundo.getBoardWidth() / 2;
         if (center) {
-            newY = board.getBoardHeight() / 2;
+            newY = mundo.getBoardHeight() / 2;
         } else {
             newY = 0;
             for (i = 0; i < coordenadasPecas.length; i++) {
@@ -176,16 +176,16 @@ public class Peca {
             }
         }
      
-        this.board = board;
-        if (!canMoveTo(newX, newY, numeroRotacao)) {
-            this.board = null;
+        this.mundo = mundo;
+        if (!verificaPosicaoPeca(newX, newY, numeroRotacao)) {
+            this.mundo = null;
             return false;
         }
 
         xPos = newX;
         yPos = newY;
         paint(color);
-        board.update();
+        mundo.update();
 
         return true;
     }
@@ -195,7 +195,7 @@ public class Peca {
 	 * from the board by this operation, resulting in the figure being left intact.
      */
     public void detach() {
-        board = null;
+        mundo = null;
     }
 
     /**
@@ -226,7 +226,7 @@ public class Peca {
      * @return true if the figure has landed, or false otherwise
      */
     public boolean hasLanded() {
-        return !isAttached() || !canMoveTo(xPos, yPos + 1, numeroRotacao);
+        return !isAttached() || !verificaPosicaoPeca(xPos, yPos + 1, numeroRotacao);
     }
 
     // metodo responsavel por efectuar os movimentos da peça para a direita, esquerda e para baixo
@@ -237,72 +237,36 @@ public class Peca {
     public void deslocarPeca(int direccao){
         
         if(direccao == -1){
-            if (isAttached() && canMoveTo(xPos - 1, yPos, numeroRotacao)) {
+            if (isAttached() && verificaPosicaoPeca(xPos - 1, yPos, numeroRotacao)) {
                 paint(null);
                 xPos--;
                 paint(color);
-                board.update();
+                mundo.update();
                 }                        
         }
         
         if(direccao == 1){
-            if (isAttached() && canMoveTo(xPos + 1, yPos, numeroRotacao)) {
+            if (isAttached() && verificaPosicaoPeca(xPos + 1, yPos, numeroRotacao)) {
                 paint(null);
                 xPos++;
                 paint(color);
-                board.update();
+                mundo.update();
             }                        
         }
         
         if(direccao == 0){
             fallen = 0;
-            if (isAttached() && canMoveTo(xPos, yPos + 1, numeroRotacao)) {
+            if (isAttached() && verificaPosicaoPeca(xPos, yPos + 1, numeroRotacao)) {
                 paint(null);
                 yPos++;
                 paint(color);
-                board.update();
+                mundo.update();
             }            
         }        
     }
 
-
     /**
-     * Moves the figure all the way down. The limits of the move are 
-     * either the square board bottom, or squares not being empty. If 
-     * no move is possible with respect to the square board, nothing 
-     * is done. The square board will be changed as the figure moves, 
-     * clearing the previous cells. If no square board is attached, nothing is done.
-	 *
-	 * @return the number of rows the figure was moved down
-     */
-//    public void moveAllWayDown() {
-//		fallen = 0;
-//        int y = yPos;
-//
-//        // Check for board
-//        if (!isAttached()) {
-//            return;
-//        }
-//
-//        // Find lowest position
-//        while (canMoveTo(xPos, y + 1, orientation)) {
-//            y++;
-//			fallen++;
-//        }
-//
-//        // Update
-//        if (y != yPos) {
-//            paint(null);
-//            yPos = y;
-//            paint(color);
-//            board.update();
-//		}
-//    }
-
-    /**
-     * Returns the current figure rotation (orientation).
-     * 
-     * @return the current figure rotation
+     * Devolve o valor actual da rotacao.
      */
     public int getRotation() {
         return numeroRotacao;
@@ -317,20 +281,20 @@ public class Peca {
      * 
      * @param rotation  the new figure orientation
      */
-    public void setRotation(int rotation) {
+    public void setRotacao(int rotacao) {
         int novoNumeroRotacoes;
 
         // Set new orientation
-        novoNumeroRotacoes = rotation % maxNumeroRotacoes;
+        novoNumeroRotacoes = rotacao % maxNumeroRotacoes;
 
         // Check new position
         if (!isAttached()) {
             numeroRotacao = novoNumeroRotacoes;
-        } else if (canMoveTo(xPos, yPos, novoNumeroRotacoes)) {
+        } else if (verificaPosicaoPeca(xPos, yPos, novoNumeroRotacoes)) {
             paint(null);
             numeroRotacao = novoNumeroRotacoes;
             paint(color);
-            board.update();
+            mundo.update();
         }
     }
 
@@ -341,8 +305,8 @@ public class Peca {
      * clearing the previous cells. If no square board is attached, 
      * the rotation is performed directly.
      */
-    public void rotateRandom() {
-        setRotation((int) (Math.random() * 4.0) % maxNumeroRotacoes);
+    public void rotacaoRandom() {
+        setRotacao((int) (Math.random() * 4.0) % maxNumeroRotacoes);
     }
 
     /**
@@ -352,11 +316,11 @@ public class Peca {
      * clearing the previous cells. If no square board is attached, 
      * the rotation is performed directly.
      */
-    public void rotateClockwise() {
+    public void rotacao() {
         if (maxNumeroRotacoes == 1) {
             return;
         } else {
-            setRotation((numeroRotacao + 1) % maxNumeroRotacoes);
+            setRotacao((numeroRotacao + 1) % maxNumeroRotacoes);
         }
     }
 
@@ -390,14 +354,14 @@ public class Peca {
      * 
      * @return true if the figure can be moved, or false otherwise
      */
-    private boolean canMoveTo(int newX, int newY, int novoNumeroRotacoes) {
+    private boolean verificaPosicaoPeca(int newX, int newY, int novoNumeroRotacoes) {
         int  x;
         int  y;
 
         for (int i = 0; i < 4; i++) {
             x = newX + getRelativeX(i, novoNumeroRotacoes);
             y = newY + getRelativeY(i, novoNumeroRotacoes);
-            if (!isInside(x, y) && !board.isSquareEmpty(x, y)) {
+            if (!isInside(x, y) && !mundo.isSquareEmpty(x, y)) {
                 return false;
             }
         }
@@ -461,7 +425,7 @@ public class Peca {
         for (int i = 0; i < coordenadasPecas.length; i++) {
             x = xPos + getRelativeX(i, numeroRotacao);
             y = yPos + getRelativeY(i, numeroRotacao);
-            board.setSquareColor(x, y, color);
+            mundo.setSquareColor(x, y, color);
         }
     }
 }
