@@ -52,6 +52,8 @@ public class Gui {
 	 * Used for storing the high score in application mode.
 	 */
 	private Preferences prefRoot = null;
+        //Peças diferentes
+        private int peca=5;
    
    
     /**
@@ -149,7 +151,7 @@ public class Gui {
     }
    private Peca randomFigure() {
        //ver isto na peca
-        return figures[(int) (Math.random() * figures.length)];
+        return new Peca(mundo, (int) (Math.random() * peca));
     }
    
    
