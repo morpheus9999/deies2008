@@ -66,6 +66,7 @@ public class ControladorDeJogo {
      * @pdOid aa36fe23-641f-4d92-98dd-a68c2ccd9555 */
     public void actualizaEstadoPeca(int estado) {
         
+        
     }
 
     /** @pdOid 9a6201c4-bc46-487c-ba67-a4249f8ded95 */

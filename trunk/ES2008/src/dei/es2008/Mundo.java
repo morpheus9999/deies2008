@@ -9,6 +9,7 @@ package dei.es2008;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
@@ -30,7 +31,16 @@ public class Mundo {
    private Peca peca=new Peca(this);
    
    /** @pdOid 062af6de-82ba-4a79-b5c3-52f9cf8d65cd */
+   private int height;
+   private int width;
+   private String  message = null;
+   private int  removedLines = 0;
    
+   /**
+     * The graphical sqare board component. This graphical 
+     * representation is created upon the first call to getComponent().
+     */
+    private SquareBoardComponent  component = null;
    public Mundo(int width, int height) {
         
         this.mundo= new Color [height][width];
@@ -44,6 +54,92 @@ public class Mundo {
         
     }
 
+    
+         /**
+     * Clears the board, i.e. removes all the colored squares. As 
+     * side-effects, the number of removed lines will be reset to 
+     * zero, and the component will be repainted immediately.
+     */
+    public void clear() {
+        removedLines = 0;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                this.mundo[y][x] = null;
+            }
+        }
+        if (component != null) {
+            component.redrawAll();
+        }
+    }
+    
+    /**
+     * Checks if a specified square is empty, i.e. if it is not 
+     * marked with a color. If the square is outside the board, 
+     * false will be returned in all cases except when the square is 
+     * directly above the board.
+     *
+     * @param x         the horizontal position (0 <= x < width)
+     * @param y         the vertical position (0 <= y < height)
+     * 
+     * @return true if the square is emtpy, or false otherwise
+     */
+    public boolean isSquareEmpty(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return x >= 0 && x < width && y < 0;
+        } else {
+            return mundo[y][x] == null;
+        }
+    }
+    
+    
+    
+    /**
+     * Changes the color of an individual square on the board. The 
+     * square will be marked as in need of a repaint, but the 
+     * graphical component will NOT be repainted until the update() method is called.
+     *
+     * @param x         the horizontal position (0 <= x < width)
+     * @param y         the vertical position (0 <= y < height)
+     * @param color     the new square color, or null for empty
+     */
+    public void setSquareColor(int x, int y, Color color) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return;
+        }
+        mundo[y][x] = color;
+        if (component != null) {
+            component.invalidateSquare(x, y);
+        }
+    }
+    /**
+     * Updates the graphical component. Any squares previously changed 
+     * will be repainted by this method.
+     */
+    public void update() {
+        component.redraw();
+    }
+     /**
+     * Sets a message to display on the square board. This is supposed 
+     * to be used when the board is not being used for active drawing, 
+     * as it slows down the drawing considerably.
+     *
+     * @param message  a message to display, or null to remove a
+     *                 previous message
+     */
+    public void setMessage(String message) {
+        this.message = message;
+        if (component != null) {
+            component.redrawAll();
+        }
+    }
+
+    void adicionarNivel(int i) {
+        this.nivel=this.nivel+i;
+    }
+
+    int getNivel() {
+        return this.nivel;
+    }
    private void fundePeca() {
       // TODO: implement
        
@@ -65,12 +161,13 @@ public class Mundo {
    public Boolean adicionarPeca() {
        
       // TODO: implement
-      
+      return true;
    }
    
    /** @pdOid a76d8a35-d893-4c83-951a-ac9c822316ee */
-   public void verificaPosicaoPeca() {
+   public boolean verificaPosicaoPeca() {
       // TODO: implement
+       return true;
    }
    
    /** @pdOid 165c287f-14f4-4b2d-ab8d-722e596edfc5 */
@@ -83,7 +180,20 @@ public class Mundo {
    public void deslocarPeca(int direccao) {
       // TODO: implement
    }
+   public Component getComponent() {
+        if (component == null) {
+            component = new SquareBoardComponent();
+        }
+        return component;
+    }
    
+   public int getBoardHeight() {
+        return height;
+    }
+   
+   public int getBoardWidth() {
+        return width;
+    }
    private class SquareBoardComponent extends Component {
 
         /**
@@ -356,7 +466,7 @@ public class Mundo {
             // Paint squares
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    if (matrix[y][x] != null) {
+                    if (mundo[y][x] != null) {
                         paintSquare(g, x, y);
                     }
                 }
@@ -376,7 +486,7 @@ public class Mundo {
          * @param y     the vertical position (0 <= y < height)
          */
         private void paintSquare(Graphics g, int x, int y) {
-            Color  color = matrix[y][x];
+            Color  color = mundo[y][x];
             int    xMin = x * squareSize.width;
             int    yMin = y * squareSize.height;
             int    xMax = xMin + squareSize.width - 1;
