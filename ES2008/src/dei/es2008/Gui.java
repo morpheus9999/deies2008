@@ -561,21 +561,11 @@ public class Gui {
             return paused;
         }
 
-        /**
-         * Sets the thread pause flag.
-         * 
-         * @param paused     the new paused flag value
-         */
         public void setPaused(boolean paused) {
             this.paused = paused;
         }
 
-        /**
-         * Adjusts the game speed according to the current level. The 
-         * sleeping time is calculated with a function making larger 
-         * steps initially an smaller as the level increases. A level 
-         * above ten (10) doesn't have any further effect.
-         */
+        
         public void adjustSpeed() {
             sleepTime = 4500 / (level + 5) - 250;
             if (sleepTime < 50) {
