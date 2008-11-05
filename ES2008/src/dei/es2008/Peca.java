@@ -51,20 +51,21 @@ public class Peca {
         xPos = 0;
         yPos = 0;
         orientation = 0;
-       
+
 
         // Initialize figure type variables
         switch (tipo) {
             
+            
         case QUADRADO:
             maxOrientation = 1;
             color = new Color(Integer.parseInt("ffd8b1", 16));
-            
+
             coordenadasPecas[0] = new Point (-1, 0);
             coordenadasPecas[1] = new Point (0, 0);
             coordenadasPecas[2] = new Point (-1, 1);
             coordenadasPecas[3] = new Point (0, 1);
-            
+                      
            
                       
             break;
@@ -250,51 +251,42 @@ public class Peca {
         return !isAttached() || !canMoveTo(xPos, yPos + 1, orientation);
     }
 
-    /**
-     * Moves the figure one step to the left. If such a move is not
-     * possible with respect to the square board, nothing is done. The 
-     * square board will be changed as the figure moves, clearing the 
-     * previous cells. If no square board is attached, nothing is done.
-     */
-    public void moveLeft() {
-        if (isAttached() && canMoveTo(xPos - 1, yPos, orientation)) {
-            paint(null);
-            xPos--;
-            paint(color);
-            board.update();
+    // metodo responsavel por efectuar os movimentos da peça para a direita, esquerda e para baixo
+    //o metodo recebe um valor inteiro que define que tipo de movimento é:
+    //direccao = -1: movimento para a esquerda
+    //direccao = 0: movimento para a baixo
+    //direccao = 1: movimento para a direita
+    public void deslocarPeca(int direccao){
+        
+        if(direccao == -1){
+            if (isAttached() && canMoveTo(xPos - 1, yPos, orientation)) {
+                paint(null);
+                xPos--;
+                paint(color);
+                board.update();
+                }                        
         }
+        
+        if(direccao == 1){
+            if (isAttached() && canMoveTo(xPos + 1, yPos, orientation)) {
+                paint(null);
+                xPos++;
+                paint(color);
+                board.update();
+            }                        
+        }
+        
+        if(direccao == 0){
+            fallen = 0;
+            if (isAttached() && canMoveTo(xPos, yPos + 1, orientation)) {
+                paint(null);
+                yPos++;
+                paint(color);
+                board.update();
+            }            
+        }        
     }
 
-    /**
-     * Moves the figure one step to the right. If such a move is not
-     * possible with respect to the square board, nothing is done. The 
-     * square board will be changed as the figure moves, clearing the 
-     * previous cells. If no square board is attached, nothing is done.
-     */
-    public void moveRight() {
-        if (isAttached() && canMoveTo(xPos + 1, yPos, orientation)) {
-            paint(null);
-            xPos++;
-            paint(color);
-            board.update();
-        }
-    }
-
-    /**
-     * Moves the figure one step down. If such a move is not possible 
-     * with respect to the square board, nothing is done. The square 
-     * board will be changed as the figure moves, clearing the 
-     * previous cells. If no square board is attached, nothing is done.
-     */
-    public void moveDown() {
-		fallen = 0;
-        if (isAttached() && canMoveTo(xPos, yPos + 1, orientation)) {
-            paint(null);
-            yPos++;
-            paint(color);
-            board.update();
-        }
-    }
 
     /**
      * Moves the figure all the way down. The limits of the move are 
