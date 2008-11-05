@@ -1,40 +1,7 @@
-/*
- * @(#)Figure.java
- *
- * This work is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This work is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * Copyright (c) 2003 Per Cederberg. All rights reserved.
- */
-
 package dei.es2008;
-
 import java.awt.Color;
 
-/**
- * A class representing a Tetris square figure. Each figure consists 
- * of four connected squares in one of seven possible constellations. 
- * The figures may be rotated in 90 degree steps and have sideways and 
- * downwards movability.<p>
- * 
- * Each figure instance can have two states, either attached to a 
- * square board or not. When attached, all move and rotation 
- * operations are checked so that collisions do not occur with other
- * squares on the board. When not attached, any rotation can be made 
- * (and will be kept when attached to a new board).
- *
- * @version  1.2
- * @author   Per Cederberg, per@percederberg.net
- */
-public class Peca extends Object {
-
+public class Peca {
 
     public static final int QUADRADO = 1;
     public static final int LINHA = 2;
@@ -43,11 +10,12 @@ public class Peca extends Object {
     public static final int L = 5;
     public static final int L_INVERTIDO = 6;
     public static final int T = 7;
-   
-    private Mundo board = null;
 
+    private Mundo board = null;
+    
     private int xPos = 0;
     private int yPos = 0;
+    private int fallen = 0;
 
     private int orientation = 0;
     private int maxOrientation = 4;
@@ -57,24 +25,6 @@ public class Peca extends Object {
 
     private Color color = Color.white;
 
-    /**
-     * Creates a new figure of one of the seven predefined types. The
-     * figure will not be attached to any square board and default
-     * colors and orientations will be assigned.
-     *
-     * @param type      the figure type (one of the figure constants)
-     * 
-     * @see #QUADRADO
-     * @see #LINHA
-     * @see #S
-     * @see #S:INVERTIDO
-     * @see #L
-     * @see #L_INVERTIDO
-     * @see #T
-     * 
-     * @throws IllegalArgumentException if the figure type specified
-     *             is not recognized
-     */
     public Peca(int tipo) throws IllegalArgumentException {
         initialize(tipo);
     }
@@ -87,13 +37,12 @@ public class Peca extends Object {
      * @see #QUADRADO
      * @see #LINHA
      * @see #S
-     * @see #S:INVERTIDO
-     * @see #L
+     * @see #S_INVERTIDO
+     * @see #l
      * @see #L_INVERTIDO
      * @see #T
      * 
-     * @throws IllegalArgumentException if the figure type specified
-     *             is not recognized
+     * @throws IllegalArgumentException if the figure type specified is not recognized
      */
     private void initialize(int tipo) throws IllegalArgumentException {
         
@@ -107,7 +56,7 @@ public class Peca extends Object {
         switch (tipo) {
         case QUADRADO:
             maxOrientation = 1;
-            color = Configuration.getColor("peca.quadrado", "#ffd8b1");
+            color = new Color(Integer.parseInt("ffd8b1", 16));
             shapeX[0] = -1;
             shapeY[0] = 0;
             shapeX[1] = 0;
@@ -119,7 +68,7 @@ public class Peca extends Object {
             break;
         case LINHA:
             maxOrientation = 2;
-            color = Configuration.getColor("peca.linha", "#ffb4b4");
+            color = new Color(Integer.parseInt("ffb4b4", 16));
             shapeX[0] = -2;
             shapeY[0] = 0;
             shapeX[1] = -1;
@@ -131,7 +80,7 @@ public class Peca extends Object {
             break;
         case S:
             maxOrientation = 2;
-            color = Configuration.getColor("peca.s", "#a3d5ee");
+            color = new Color(Integer.parseInt("a3d5ee", 16));
             shapeX[0] = 0;
             shapeY[0] = 0;
             shapeX[1] = 1;
@@ -143,7 +92,7 @@ public class Peca extends Object {
             break;
         case S_INVERTIDO:
             maxOrientation = 2;
-            color = Configuration.getColor("peca.s_invertido", "#f4adff");
+            color = new Color(Integer.parseInt("f4adff", 16));
             shapeX[0] = -1;
             shapeY[0] = 0;
             shapeX[1] = 0;
@@ -155,7 +104,7 @@ public class Peca extends Object {
             break;
         case L:
             maxOrientation = 4;
-            color = Configuration.getColor("peca.l", "#c0b6fa");
+            color = new Color(Integer.parseInt("c0b6fa", 16));
             shapeX[0] = -1;
             shapeY[0] = 0;
             shapeX[1] = 0;
@@ -167,7 +116,7 @@ public class Peca extends Object {
             break;
         case L_INVERTIDO:
             maxOrientation = 4;
-            color = Configuration.getColor("peca.l_invertido", "#f5f4a7");
+            color = new Color(Integer.parseInt("f5f4a7", 16));
             shapeX[0] = -1;
             shapeY[0] = 0;
             shapeX[1] = 0;
@@ -179,7 +128,7 @@ public class Peca extends Object {
             break;
         case T:
             maxOrientation = 4;
-            color = Configuration.getColor("peca.t", "#a4d9b6");
+            color = new Color(Integer.parseInt("a4d9b6", 16));
             shapeX[0] = -1;
             shapeY[0] = 0;
             shapeX[1] = 0;
@@ -190,16 +139,14 @@ public class Peca extends Object {
             shapeY[3] = 1;
             break;
         default :
-            throw new IllegalArgumentException("No figure constant: " + 
-                                               tipo);
+            throw new IllegalArgumentException("No figure constant: " + tipo);
         }
     }
 
     /**
      * Checks if this figure is attached to a square board.
      * 
-     * @return true if the figure is already attached, or
-     *         false otherwise
+     * @return true if the figure is already attached, or false otherwise
      */
     public boolean isAttached() {
         return board != null;
@@ -222,8 +169,7 @@ public class Peca extends Object {
      * @param board     the square board to attach to
      * @param center    the centered position flag
      * 
-     * @return true if the figure could be attached, or
-     *         false otherwise
+     * @return true if the figure could be attached, or false otherwise
      */
     public boolean attach(Mundo board, boolean center) {
         int  newX;
@@ -269,9 +215,8 @@ public class Peca extends Object {
     }
     
     /**
-     * Detaches this figure from its square board. The figure will not
-     * be removed from the board by this operation, resulting in the
-     * figure being left intact.
+     * Detaches this figure from its square board. The figure will not be removed
+	 * from the board by this operation, resulting in the figure being left intact.
      */
     public void detach() {
         board = null;
@@ -281,8 +226,7 @@ public class Peca extends Object {
      * Checks if the figure is fully visible on the square board. If
      * the figure isn't attached to a board, false will be returned.
      * 
-     * @return true if the figure is fully visible, or 
-     *         false otherwise
+     * @return true if the figure is fully visible, or false otherwise
      */
     public boolean isAllVisible() {
         if (!isAttached()) {
@@ -297,10 +241,16 @@ public class Peca extends Object {
     }
 
     /**
+     * @return the number of rows this figure has fallen
+     */
+    public int numRowsFallen() {
+        return fallen;
+    }
+
+    /**
      * Checks if the figure has landed. If this method returns true,
      * the moveDown() or the moveAllWayDown() methods should have no 
-     * effect. If no square board is attached, this method will return
-     * true.
+     * effect. If no square board is attached, this method will return true.
      *
      * @return true if the figure has landed, or false otherwise
      */
@@ -312,8 +262,7 @@ public class Peca extends Object {
      * Moves the figure one step to the left. If such a move is not
      * possible with respect to the square board, nothing is done. The 
      * square board will be changed as the figure moves, clearing the 
-     * previous cells. If no square board is attached, nothing is 
-     * done.
+     * previous cells. If no square board is attached, nothing is done.
      */
     public void moveLeft() {
         if (isAttached() && canMoveTo(xPos - 1, yPos, orientation)) {
@@ -328,8 +277,7 @@ public class Peca extends Object {
      * Moves the figure one step to the right. If such a move is not
      * possible with respect to the square board, nothing is done. The 
      * square board will be changed as the figure moves, clearing the 
-     * previous cells. If no square board is attached, nothing is 
-     * done.
+     * previous cells. If no square board is attached, nothing is done.
      */
     public void moveRight() {
         if (isAttached() && canMoveTo(xPos + 1, yPos, orientation)) {
@@ -344,10 +292,10 @@ public class Peca extends Object {
      * Moves the figure one step down. If such a move is not possible 
      * with respect to the square board, nothing is done. The square 
      * board will be changed as the figure moves, clearing the 
-     * previous cells. If no square board is attached, nothing is 
-     * done.
+     * previous cells. If no square board is attached, nothing is done.
      */
     public void moveDown() {
+		fallen = 0;
         if (isAttached() && canMoveTo(xPos, yPos + 1, orientation)) {
             paint(null);
             yPos++;
@@ -361,10 +309,12 @@ public class Peca extends Object {
      * either the square board bottom, or squares not being empty. If 
      * no move is possible with respect to the square board, nothing 
      * is done. The square board will be changed as the figure moves, 
-     * clearing the previous cells. If no square board is attached, 
-     * nothing is done.
+     * clearing the previous cells. If no square board is attached, nothing is done.
+	 *
+	 * @return the number of rows the figure was moved down
      */
     public void moveAllWayDown() {
+		fallen = 0;
         int y = yPos;
 
         // Check for board
@@ -375,6 +325,7 @@ public class Peca extends Object {
         // Find lowest position
         while (canMoveTo(xPos, y + 1, orientation)) {
             y++;
+			fallen++;
         }
 
         // Update
@@ -383,7 +334,7 @@ public class Peca extends Object {
             yPos = y;
             paint(color);
             board.update();
-        }
+		}
     }
 
     /**
@@ -463,14 +414,12 @@ public class Peca extends Object {
     }
 
     /**
-     * Checks if a specified pair of (square) coordinates are inside 
-     * the figure, or not.
+     * Checks if a specified pair of (square) coordinates are inside the figure, or not.
      *
      * @param x         the horizontal position
      * @param y         the vertical position
      * 
-     * @return true if the coordinates are inside the figure, or
-     *         false otherwise
+     * @return true if the coordinates are inside the figure, or false otherwise
      */
     private boolean isInside(int x, int y) {
         for (int i = 0; i < shapeX.length; i++) {
@@ -486,15 +435,13 @@ public class Peca extends Object {
     /**
      * Checks if the figure can move to a new position. The current 
      * figure position is taken into account when checking for 
-     * collisions. If a collision is detected, this method will return
-     * false.
+     * collisions. If a collision is detected, this method will return false.
      *
      * @param newX            the new horizontal position
      * @param newY            the new vertical position
      * @param newOrientation  the new orientation (rotation)
      * 
-     * @return true if the figure can be moved, or
-     *         false otherwise
+     * @return true if the figure can be moved, or false otherwise
      */
     private boolean canMoveTo(int newX, int newY, int newOrientation) {
         int  x;
@@ -512,8 +459,7 @@ public class Peca extends Object {
 
     /**
      * Returns the relative horizontal position of a specified square.
-     * The square will be rotated according to the specified 
-     * orientation.
+     * The square will be rotated according to the specified orientation.
      *
      * @param square       the square to rotate (0-3)
      * @param orientation  the orientation to use (0-3)
@@ -537,8 +483,7 @@ public class Peca extends Object {
 
     /**
      * Rotates the relative vertical position of a specified square. 
-     * The square will be rotated according to the specified 
-     * orientation.
+     * The square will be rotated according to the specified orientation.
      *
      * @param square       the square to rotate (0-3)
      * @param orientation  the orientation to use (0-3)
