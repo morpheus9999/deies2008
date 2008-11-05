@@ -19,8 +19,8 @@ public class Peca {
     private int yPos = 0;
     private int fallen = 0;
 
-    private int orientation = 0;
-    private int maxOrientation = 4;
+    private int numeroRotacao = 0;
+    private int maxNumeroRotacoes = 4;
 
     private Color color = Color.white;
 
@@ -30,104 +30,85 @@ public class Peca {
     }
     
     /**
-     * Initializes the instance variables for a specified figure type.
-     * 
-     * @param type      the figure type (one of the figure constants)
-     * 
+     * as diversas pecas possiveis sao:
      * @see #QUADRADO
      * @see #LINHA
      * @see #S
      * @see #S_INVERTIDO
-     * @see #l
+     * @see #L
      * @see #L_INVERTIDO
-     * @see #T
-     * 
-     * @throws IllegalArgumentException if the figure type specified is not recognized
+     * @see #T   
      */
     private void initialize(int tipo) throws IllegalArgumentException {
-        
-        // Initialize default variables
+                
         board = null;
         xPos = 0;
         yPos = 0;
-        orientation = 0;
+        numeroRotacao = 0;
 
-
-        // Initialize figure type variables
         switch (tipo) {
-            
-            
+                        
         case QUADRADO:
-            maxOrientation = 1;
+            maxNumeroRotacoes = 1;
             color = new Color(Integer.parseInt("ffd8b1", 16));
-
             coordenadasPecas[0] = new Point (-1, 0);
             coordenadasPecas[1] = new Point (0, 0);
             coordenadasPecas[2] = new Point (-1, 1);
-            coordenadasPecas[3] = new Point (0, 1);
-                      
-           
-                      
+            coordenadasPecas[3] = new Point (0, 1);          
             break;
             
         case LINHA:
-            maxOrientation = 2;
+            maxNumeroRotacoes = 2;
             color = new Color(Integer.parseInt("ffb4b4", 16));
             coordenadasPecas[0] = new Point (-2, 0);
             coordenadasPecas[1] = new Point (-1, 0);
             coordenadasPecas[2] = new Point (0, 0);
-            coordenadasPecas[3] = new Point (1, 0);
-                      
+            coordenadasPecas[3] = new Point (1, 0);                      
             break;
             
         case S:
-            maxOrientation = 2;
+            maxNumeroRotacoes = 2;
             color = new Color(Integer.parseInt("a3d5ee", 16));
             coordenadasPecas[0] = new Point (0, 0);
             coordenadasPecas[1] = new Point (1, 0);
             coordenadasPecas[2] = new Point (-1, 1);
-            coordenadasPecas[3] = new Point (0, 1);            
-            
+            coordenadasPecas[3] = new Point (0, 1);                        
             break;
             
         case S_INVERTIDO:
-            maxOrientation = 2;
+            maxNumeroRotacoes = 2;
             color = new Color(Integer.parseInt("f4adff", 16));
             coordenadasPecas[0] = new Point (-1, 0);
             coordenadasPecas[1] = new Point (0, 0);
             coordenadasPecas[2] = new Point (0, 1);
-            coordenadasPecas[3] = new Point (1, 1);
-                      
+            coordenadasPecas[3] = new Point (1, 1);                      
             break;
             
         case L:
-            maxOrientation = 4;
+            maxNumeroRotacoes = 4;
             color = new Color(Integer.parseInt("c0b6fa", 16));
             coordenadasPecas[0] = new Point (-1, 0);
             coordenadasPecas[1] = new Point (0, 0);
             coordenadasPecas[2] = new Point (1, 0);
-            coordenadasPecas[3] = new Point (1, 1);
-            
+            coordenadasPecas[3] = new Point (1, 1);            
             break;
             
         case L_INVERTIDO:
-            maxOrientation = 4;
+            maxNumeroRotacoes = 4;
             color = new Color(Integer.parseInt("f5f4a7", 16));
             coordenadasPecas[0] = new Point (-1, 0);
             coordenadasPecas[1] = new Point (0, 0);
             coordenadasPecas[2] = new Point (1, 0);
-            coordenadasPecas[3] = new Point (-1, 1);
-            
+            coordenadasPecas[3] = new Point (-1, 1);            
             break;
             
         case T:
-            maxOrientation = 4;
+            maxNumeroRotacoes = 4;
             color = new Color(Integer.parseInt("a4d9b6", 16));
             coordenadasPecas[0] = new Point (-1, 0);
             coordenadasPecas[1] = new Point (0, 0);
             coordenadasPecas[2] = new Point (1, 0);
-            coordenadasPecas[3] = new Point (0, 1);
-            
+            coordenadasPecas[3] = new Point (0, 1);            
             break;
             
         default :
@@ -136,21 +117,22 @@ public class Peca {
     }
 
     /**
-     * Checks if this figure is attached to a square board.
-     * 
-     * @return true if the figure is already attached, or false otherwise
+     
+     * @return true se a peca ja esta agarrada ao mundo
      */
     public boolean isAttached() {
         return board != null;
     }
-/**
-     * @return the number of rows this figure has fallen
+    /**
+     * @return o numero de linhas que a peca fez cair     
      */
     public int numRowsFallen() {
         return fallen;
     }
 
     /**
+     * 
+     * 
      * Attaches the figure to a specified square board. The figure 
      * will be drawn either at the absolute top of the board, with 
      * only the bottom line visible, or centered onto the board. In 
@@ -179,31 +161,27 @@ public class Peca {
             detach();
         }
 
-        // Reset position (for correct controls)
         xPos = 0;
         yPos = 0;
 
-        // Calculate position
         newX = board.getBoardWidth() / 2;
         if (center) {
             newY = board.getBoardHeight() / 2;
         } else {
             newY = 0;
             for (i = 0; i < coordenadasPecas.length; i++) {
-                if (getRelativeY(i, orientation) - newY > 0) {
-                    newY = -getRelativeY(i, orientation);
+                if (getRelativeY(i, numeroRotacao) - newY > 0) {
+                    newY = -getRelativeY(i, numeroRotacao);
                 }
             }
         }
-
-        // Check position        
+     
         this.board = board;
-        if (!canMoveTo(newX, newY, orientation)) {
+        if (!canMoveTo(newX, newY, numeroRotacao)) {
             this.board = null;
             return false;
         }
 
-        // Draw figure
         xPos = newX;
         yPos = newY;
         paint(color);
@@ -231,7 +209,7 @@ public class Peca {
             return false;
         }
          for (int i = 0; i < coordenadasPecas.length; i++) {
-            if (yPos + getRelativeY(i, orientation) < 0) {
+            if (yPos + getRelativeY(i, numeroRotacao) < 0) {
                 return false;
             }
         }
@@ -248,7 +226,7 @@ public class Peca {
      * @return true if the figure has landed, or false otherwise
      */
     public boolean hasLanded() {
-        return !isAttached() || !canMoveTo(xPos, yPos + 1, orientation);
+        return !isAttached() || !canMoveTo(xPos, yPos + 1, numeroRotacao);
     }
 
     // metodo responsavel por efectuar os movimentos da peça para a direita, esquerda e para baixo
@@ -259,7 +237,7 @@ public class Peca {
     public void deslocarPeca(int direccao){
         
         if(direccao == -1){
-            if (isAttached() && canMoveTo(xPos - 1, yPos, orientation)) {
+            if (isAttached() && canMoveTo(xPos - 1, yPos, numeroRotacao)) {
                 paint(null);
                 xPos--;
                 paint(color);
@@ -268,7 +246,7 @@ public class Peca {
         }
         
         if(direccao == 1){
-            if (isAttached() && canMoveTo(xPos + 1, yPos, orientation)) {
+            if (isAttached() && canMoveTo(xPos + 1, yPos, numeroRotacao)) {
                 paint(null);
                 xPos++;
                 paint(color);
@@ -278,7 +256,7 @@ public class Peca {
         
         if(direccao == 0){
             fallen = 0;
-            if (isAttached() && canMoveTo(xPos, yPos + 1, orientation)) {
+            if (isAttached() && canMoveTo(xPos, yPos + 1, numeroRotacao)) {
                 paint(null);
                 yPos++;
                 paint(color);
@@ -327,7 +305,7 @@ public class Peca {
      * @return the current figure rotation
      */
     public int getRotation() {
-        return orientation;
+        return numeroRotacao;
     }
     
     /**
@@ -340,17 +318,17 @@ public class Peca {
      * @param rotation  the new figure orientation
      */
     public void setRotation(int rotation) {
-        int newOrientation;
+        int novoNumeroRotacoes;
 
         // Set new orientation
-        newOrientation = rotation % maxOrientation;
+        novoNumeroRotacoes = rotation % maxNumeroRotacoes;
 
         // Check new position
         if (!isAttached()) {
-            orientation = newOrientation;
-        } else if (canMoveTo(xPos, yPos, newOrientation)) {
+            numeroRotacao = novoNumeroRotacoes;
+        } else if (canMoveTo(xPos, yPos, novoNumeroRotacoes)) {
             paint(null);
-            orientation = newOrientation;
+            numeroRotacao = novoNumeroRotacoes;
             paint(color);
             board.update();
         }
@@ -364,7 +342,7 @@ public class Peca {
      * the rotation is performed directly.
      */
     public void rotateRandom() {
-        setRotation((int) (Math.random() * 4.0) % maxOrientation);
+        setRotation((int) (Math.random() * 4.0) % maxNumeroRotacoes);
     }
 
     /**
@@ -375,25 +353,10 @@ public class Peca {
      * the rotation is performed directly.
      */
     public void rotateClockwise() {
-        if (maxOrientation == 1) {
+        if (maxNumeroRotacoes == 1) {
             return;
         } else {
-            setRotation((orientation + 1) % maxOrientation);
-        }
-    }
-
-    /**
-     * Rotates the figure counter-clockwise. If such a rotation
-     * is not possible with respect to the square board, nothing
-     * is done. The square board will be changed as the figure
-     * moves, clearing the previous cells. If no square board is 
-     * attached, the rotation is performed directly.
-     */
-    public void rotateCounterClockwise() {
-        if (maxOrientation == 1) {
-            return;
-        } else {
-            setRotation((orientation + 3) % 4);
+            setRotation((numeroRotacao + 1) % maxNumeroRotacoes);
         }
     }
 
@@ -407,8 +370,8 @@ public class Peca {
      */
     private boolean isInside(int x, int y) {
         for (int i = 0; i < coordenadasPecas.length; i++) {
-            if (x == xPos + getRelativeX(i, orientation)
-             && y == yPos + getRelativeY(i, orientation)) {
+            if (x == xPos + getRelativeX(i, numeroRotacao)
+             && y == yPos + getRelativeY(i, numeroRotacao)) {
 
                 return true;
             }
@@ -427,13 +390,13 @@ public class Peca {
      * 
      * @return true if the figure can be moved, or false otherwise
      */
-    private boolean canMoveTo(int newX, int newY, int newOrientation) {
+    private boolean canMoveTo(int newX, int newY, int novoNumeroRotacoes) {
         int  x;
         int  y;
 
         for (int i = 0; i < 4; i++) {
-            x = newX + getRelativeX(i, newOrientation);
-            y = newY + getRelativeY(i, newOrientation);
+            x = newX + getRelativeX(i, novoNumeroRotacoes);
+            y = newY + getRelativeY(i, novoNumeroRotacoes);
             if (!isInside(x, y) && !board.isSquareEmpty(x, y)) {
                 return false;
             }
@@ -450,8 +413,8 @@ public class Peca {
      * 
      * @return the rotated relative horizontal position
      */
-    private int getRelativeX(int square, int orientation) {
-        switch (orientation % 4) {
+    private int getRelativeX(int square, int numeroRotacoes) {
+        switch (numeroRotacoes % 4) {
         case 0 :
             return coordenadasPecas[square].x;
         case 1 :
@@ -474,32 +437,30 @@ public class Peca {
      * 
      * @return the rotated relative vertical position
      */
-    private int getRelativeY(int square, int orientation) {
-        switch (orientation % 4) {
+    private int getRelativeY(int bloco, int numeroRotacoes) {
+        switch (numeroRotacoes % 4) {
         case 0 :
-            return coordenadasPecas[square].y;
+            return coordenadasPecas[bloco].y;
         case 1 :
-            return coordenadasPecas[square].x;
+            return coordenadasPecas[bloco].x;
         case 2 :
-            return -coordenadasPecas[square].y;
+            return -coordenadasPecas[bloco].y;
         case 3 :
-            return -coordenadasPecas[square].x;
+            return -coordenadasPecas[bloco].x;
         default:
             return 0; // Should never occur
         }
     }
     
     /**
-     * Paints the figure on the board with the specified color.
-     *
-     * @param color     the color to paint with, or null for clearing
+     * Pinta a peca no mundo com uma cor especifica.             
      */
     private void paint(Color color) {
         int x, y;
 
         for (int i = 0; i < coordenadasPecas.length; i++) {
-            x = xPos + getRelativeX(i, orientation);
-            y = yPos + getRelativeY(i, orientation);
+            x = xPos + getRelativeX(i, numeroRotacao);
+            y = yPos + getRelativeY(i, numeroRotacao);
             board.setSquareColor(x, y, color);
         }
     }
