@@ -32,9 +32,9 @@ public class ControladorDeJogo {
     
     /** @pdOid 8a29e47a-dd73-4a0d-a56f-9206850587c4 */
     
-    public void iniciarJogo() {
-        this.mundo=new Mundo();
-    }
+//    public void iniciarJogo() {
+//        this.mundo=new Mundo();
+//    }
 
     /** @pdOid c7ee8da6-ce9f-4a5d-ae80-c7b0adee3768 */
     public void sairJogo() {
