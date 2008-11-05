@@ -12,9 +12,9 @@ public class ControladorDeJogo {
 
 
     
-    private Mundo board = null;
-    private Mundo previewBoard = new Mundo(5, 5);
-
+    public Mundo board = null;
+    public Mundo previewBoard = new Mundo(5, 5);
+    public Gui componente =null;
     private Peca[] figures = {
         new Peca(Peca.QUADRADO),
         new Peca(Peca.LINHA),
@@ -100,7 +100,7 @@ public class ControladorDeJogo {
     /**
      * Inicializa as variaveis do jogo antes de iniar um jogo
      */
-    private void handleStart() {
+    public void handleStart() {
 
         nivel = 1;
         pontuacao = 0;
@@ -122,7 +122,7 @@ public class ControladorDeJogo {
     /**
      * Para a thread do jogo, faz reset as pecas e escreve uma mensagem de fim de jogo.
      */
-    private void handleGameOver() {
+    public void handleGameOver() {
 
         thread.setPaused(true);
         
@@ -149,7 +149,7 @@ public class ControladorDeJogo {
     /**
      * Faz pausa no jogo e escreve uma mensagem de pausa no ecra.
      */
-    private void handlePause() {
+    public void handlePause() {
         thread.setPaused(true);
         
         board.setMensagem("Pausado");
@@ -159,7 +159,7 @@ public class ControladorDeJogo {
     /**
      * retoma o jogo depois de uma pausa. repoe a thread e remove a mensagem de pausa do ecra.
      */
-    private void handleResume() {
+    public void handleResume() {
         board.setMensagem(null);
         componente.button.setLabel("Pausar");
         thread.setPaused(false);
@@ -168,7 +168,7 @@ public class ControladorDeJogo {
     /**
      * Modifica o nivel e ajusta a velocidade da thread.
      */
-    private void handleLevelModification() {
+    public void handleLevelModification() {
         componente.levelLabel.setText("Nível: " + nivel);
         thread.adjustSpeed();
     }
@@ -176,14 +176,14 @@ public class ControladorDeJogo {
     /**
      * modifica a label da pontuacao.
      */
-    private void handleScoreModification() {
+    public void handleScoreModification() {
         componente.scoreLabel.setText("Pontuação: " + pontuacao);
     }
  
     /**
      * Modifica o ranking se necessari
      */
-    private void handleHighScoreModification() {
+    public void handleHighScoreModification() {
 		if (ranking.inserePontuacao(pontuacao)) {
 			String hs = ranking.getSerializedPontuacoes();
 			try {
@@ -204,7 +204,7 @@ public class ControladorDeJogo {
      * Metodo que move a "peca seguinte" para a posicao da "peca actual" e 
      * cria uma nova "peca seguinte".
      */
-    private void handleFigureStart() {
+    public void handleFigureStart() {
         int  rotation;
 
         peca = pecaSeguinte;
@@ -234,7 +234,7 @@ public class ControladorDeJogo {
      * de "game over".
      */
 
-    private void handleFigureLanded() {
+    public void handleFigureLanded() {
 
 
         if (peca.isAllVisible()) {
@@ -281,7 +281,7 @@ public class ControladorDeJogo {
      * Metodo que faz descer a peca no tabuleiro ao longo do tempo.
      * Verifica a cada instante se a peca assentou no tabuleiro.
      */
-    private synchronized void handleTimer() {
+    public synchronized void handleTimer() {
         if (peca == null) {
             handleFigureStart();
         } else if (peca.hasLanded()) {
@@ -291,7 +291,7 @@ public class ControladorDeJogo {
         }
     }
 
-    private synchronized void handleButtonPressed() {
+    public synchronized void handleButtonPressed() {
         if (pecaSeguinte == null) {
             handleStart();
         } else if (thread.isPaused()) {
@@ -301,7 +301,7 @@ public class ControladorDeJogo {
         }
     }
 
-    private synchronized void handleKeyEvent(KeyEvent e) {
+    public synchronized void handleKeyEvent(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_P) {
             handleButtonPressed();
