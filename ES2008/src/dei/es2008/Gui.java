@@ -15,11 +15,11 @@ import javax.swing.*;
 class Gui extends JPanel {
         private ControladorDeJogo controlo;
         private Dimension  size = null;
-        private JLabel scoreLabel = new JLabel("Pontuação: 0");
+        public JLabel scoreLabel = new JLabel("Pontuação: 0");
         private JLabel highScoreLabel = new JLabel("");
         private JList highScoreList;
-        private JLabel levelLabel = new JLabel("Nível: 1");
-        private JButton button = new JButton("Iniciar");
+        public JLabel levelLabel = new JLabel("Nível: 1");
+        public JButton button = new JButton("Iniciar");
         
         public Gui (ListModel lm,ControladorDeJogo controlo) {
             super();
