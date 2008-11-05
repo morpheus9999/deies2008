@@ -297,29 +297,29 @@ public class Peca {
 	 *
 	 * @return the number of rows the figure was moved down
      */
-    public void moveAllWayDown() {
-		fallen = 0;
-        int y = yPos;
-
-        // Check for board
-        if (!isAttached()) {
-            return;
-        }
-
-        // Find lowest position
-        while (canMoveTo(xPos, y + 1, orientation)) {
-            y++;
-			fallen++;
-        }
-
-        // Update
-        if (y != yPos) {
-            paint(null);
-            yPos = y;
-            paint(color);
-            board.update();
-		}
-    }
+//    public void moveAllWayDown() {
+//		fallen = 0;
+//        int y = yPos;
+//
+//        // Check for board
+//        if (!isAttached()) {
+//            return;
+//        }
+//
+//        // Find lowest position
+//        while (canMoveTo(xPos, y + 1, orientation)) {
+//            y++;
+//			fallen++;
+//        }
+//
+//        // Update
+//        if (y != yPos) {
+//            paint(null);
+//            yPos = y;
+//            paint(color);
+//            board.update();
+//		}
+//    }
 
     /**
      * Returns the current figure rotation (orientation).

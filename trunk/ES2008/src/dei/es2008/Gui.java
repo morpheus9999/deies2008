@@ -469,10 +469,11 @@ public class Gui {
         case KeyEvent.VK_RIGHT:
             figure.deslocarPeca(1);
             break;
-
+            
         case KeyEvent.VK_SPACE:
-            figure.moveAllWayDown();
-            moveLock = true;
+            figure.rotateClockwise();
+            //figure.moveAllWayDown();
+            //moveLock = true;
             break;
 
         case KeyEvent.VK_UP:
@@ -480,7 +481,8 @@ public class Gui {
 			break;
 
         case KeyEvent.VK_DOWN:
-			figure.rotateCounterClockwise();
+			figure.deslocarPeca(0);
+                        //figure.rotateCounterClockwise();
             break;
 
         case KeyEvent.VK_S:
