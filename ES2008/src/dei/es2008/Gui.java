@@ -117,7 +117,7 @@ public class Gui {
 			try {
 				InputStream is = appContext.getStream("Ranking");
 				BufferedReader br = new BufferedReader(new InputStreamReader(is));
-				highScore.setSerializedScores(br.readLine());
+				highScore.setSerializedPontuacoes(br.readLine());
 				br.close();
 				is.close();
 			} catch (Exception ex) {
@@ -127,7 +127,7 @@ public class Gui {
 			prefRoot = Preferences.userNodeForPackage(Gui.class);
 			String hs = prefRoot.get("", null);
 			if (hs != null)
-				highScore.setSerializedScores(hs);
+				highScore.setSerializedPontuacoes(hs);
 			showPreview = prefRoot.getBoolean("ver peça seguinte", true);
 		}
     }
@@ -271,8 +271,8 @@ public class Gui {
      * Handle a high score modification event. This will modify the high score list if necessary.
      */
     private void handleHighScoreModification() {
-		if (highScore.putScore(score)) {
-			String hs = highScore.getSerializedScores();
+		if (highScore.inserePontuacao(score)) {
+			String hs = highScore.getSerializedPontuacoes();
 			try {
 				if (isApplet) {
 					InputStream bais = new ByteArrayInputStream(hs.getBytes());
