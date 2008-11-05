@@ -43,7 +43,7 @@ public class Mundo extends Object {
      * a color entry for each square in the board. The matrix is 
      * indexed by the vertical, and then the horizontal coordinate.
      */
-    private Color[][]  matrix = null;
+    private Color[][]  mundo = null;
 
     /**
      * An optional board message. The board message can be set at any
@@ -74,7 +74,7 @@ public class Mundo extends Object {
     public Mundo(int width, int height) {
         this.width = width;
         this.height = height;
-        this.matrix = new Color[height][width];
+        this.mundo = new Color[height][width];
         clear();
     }
 
@@ -108,7 +108,7 @@ public class Mundo extends Object {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             return x >= 0 && x < width && y < 0;
         } else {
-            return matrix[y][x] == null;
+            return mundo[y][x] == null;
         }
     }
 
@@ -127,7 +127,7 @@ public class Mundo extends Object {
             return false;
         }
         for (int x = 0; x < width; x++) {
-            if (matrix[y][x] != null) {
+            if (mundo[y][x] != null) {
                 return false;
             }
         }
@@ -149,7 +149,7 @@ public class Mundo extends Object {
             return true;
         }
         for (int x = 0; x < width; x++) {
-            if (matrix[y][x] == null) {
+            if (mundo[y][x] == null) {
                 return false;
             }
         }
@@ -229,7 +229,7 @@ public class Mundo extends Object {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             return null;
         } else {
-            return matrix[y][x];
+            return mundo[y][x];
         }
     }
 
@@ -247,7 +247,7 @@ public class Mundo extends Object {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             return;
         }
-        matrix[y][x] = color;
+        mundo[y][x] = color;
         if (component != null) {
             component.invalidateSquare(x, y);
         }
@@ -277,7 +277,7 @@ public class Mundo extends Object {
         removedLines = 0;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                this.matrix[y][x] = null;
+                this.mundo[y][x] = null;
             }
         }
         if (component != null) {
@@ -325,11 +325,11 @@ public class Mundo extends Object {
         }
         for (; y > 0; y--) {
             for (int x = 0; x < width; x++) {
-                matrix[y][x] = matrix[y - 1][x];
+                mundo[y][x] = mundo[y - 1][x];
             }
         }
         for (int x = 0; x < width; x++) {
-            matrix[0][x] = null;
+            mundo[0][x] = null;
         }
     }
 
@@ -637,7 +637,7 @@ public class Mundo extends Object {
             // Paint squares
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    if (matrix[y][x] != null) {
+                    if (mundo[y][x] != null) {
                         paintSquare(g, x, y);
                     }
                 }
@@ -658,7 +658,7 @@ public class Mundo extends Object {
          * @param y     the vertical position (0 <= y < height)
          */
         private void paintSquare(Graphics g, int x, int y) {
-            Color  color = matrix[y][x];
+            Color  color = mundo[y][x];
             int    xMin = x * squareSize.width;
             int    yMin = y * squareSize.height;
             int    xMax = xMin + squareSize.width - 1;
