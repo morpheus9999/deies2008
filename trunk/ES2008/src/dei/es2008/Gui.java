@@ -6,7 +6,9 @@
 
 package dei.es2008;
 
+import java.applet.AppletContext;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -44,6 +46,16 @@ public class Gui {
      * will be shown in the figure preview board.
      */
     private boolean showPreview = true;
+    
+    /**
+     * The current high score list. This is saved between application runs.
+     */
+    private Ranking highScore;
+    
+    /**
+	 * Used for storing the high score in applet mode.
+	 */
+	private AppletContext appContext = null;
    /**
      * The graphical game component. This component is created on the first call to getComponent().
      */
@@ -96,6 +108,35 @@ public class Gui {
         mundo.setMessage("Press start");
         thread = new GameThread();
     }
+    
+    /**
+	 * For pasing the AppletContext when running in applet mode.
+	 */
+	public void setAppletContext (AppletContext ac) {
+		appContext = ac;
+	}
+
+    /**
+     * Kills the game running thread and makes necessary clean-up.
+     * After calling this method, no further methods in this class
+     * should be called. Neither should the component returned earlier be trusted upon.
+     */
+    public void quit() {
+        thread = null;
+    }
+
+    /**
+     * Returns a new component that draws the game.
+     * 
+     * @return the component that draws the game
+     */
+    public Component getComponent() {
+        if (component == null) {
+            component = new GamePanel(highScore);
+        }
+        return component;
+    }
+
    public void Gui(){
         
         //Meter a seguir qualquer coisa para iniciar
@@ -141,9 +182,9 @@ public class Gui {
    }
    
    /** @pdOid 58082346-d6b2-4ec1-8f20-6b5f7c85d0cd */
-   public void inserirCodigo() {
-      controladorDeJogo.inserirCodigo(peca);
-   }
+//   public void inserirCodigo() {
+//      controladorDeJogo.inserirCodigo(peca);
+//   }
    
    /** @pdOid bfcc7152-43d6-4caa-ba85-234bd21665c0 */
    public void pausarJogo() {
@@ -238,7 +279,7 @@ public class Gui {
 					break;
 			}
             if (mundo.getNivel() < 9 && mundo.getRemovedLines() / 20 > mundo.getNivel()) {
-                mundo.getNivel() = mundo.getRemovedLines() / 20;
+                mundo.nivel = mundo.getRemovedLines() / 20;
                 handleLevelModification();
             }
         } else {
@@ -428,7 +469,7 @@ public class Gui {
 
 //        case KeyEvent.VK_DOWN:
 //			figure.rotateCounterClockwise();
-            break;
+//            break;
 
         case KeyEvent.VK_S:
             if (mundo.getNivel() < 9) {
