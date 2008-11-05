@@ -13,7 +13,7 @@ public class Peca {
     public static final int T = 7;
 
     private Mundo board = null;
-    private Point[] coordenadasPecas = new Point[4];
+    private Point[] coordenadasPecas ;
     
     private int xPos = 0;
     private int yPos = 0;
@@ -25,6 +25,7 @@ public class Peca {
     private Color color = Color.white;
 
     public Peca(int tipo) throws IllegalArgumentException {
+        coordenadasPecas = new Point[4];
         initialize(tipo);
     }
     
@@ -50,6 +51,7 @@ public class Peca {
         xPos = 0;
         yPos = 0;
         orientation = 0;
+       
 
         // Initialize figure type variables
         switch (tipo) {
@@ -58,98 +60,73 @@ public class Peca {
             maxOrientation = 1;
             color = new Color(Integer.parseInt("ffd8b1", 16));
             
-            coordenadasPecas[0].x = -1;
-            coordenadasPecas[0].y = 0;           
-            coordenadasPecas[1].x = 0;
-            coordenadasPecas[1].y = 0;
-            coordenadasPecas[2].x = -1;
-            coordenadasPecas[2].y = 1;
-            coordenadasPecas[3].x = 0;
-            coordenadasPecas[3].y = 1;            
+            coordenadasPecas[0] = new Point (-1, 0);
+            coordenadasPecas[1] = new Point (0, 0);
+            coordenadasPecas[2] = new Point (-1, 1);
+            coordenadasPecas[3] = new Point (0, 1);
+            
+           
+                      
             break;
             
         case LINHA:
             maxOrientation = 2;
             color = new Color(Integer.parseInt("ffb4b4", 16));
-            
-            coordenadasPecas[0].x = -2;
-            coordenadasPecas[0].y = 0;           
-            coordenadasPecas[1].x = -1;
-            coordenadasPecas[1].y = 0;
-            coordenadasPecas[2].x = 0;
-            coordenadasPecas[2].y = 0;
-            coordenadasPecas[3].x = 1;
-            coordenadasPecas[3].y = 0;           
+            coordenadasPecas[0] = new Point (-2, 0);
+            coordenadasPecas[1] = new Point (-1, 0);
+            coordenadasPecas[2] = new Point (0, 0);
+            coordenadasPecas[3] = new Point (1, 0);
+                      
             break;
             
         case S:
             maxOrientation = 2;
             color = new Color(Integer.parseInt("a3d5ee", 16));
-                        
-            coordenadasPecas[0].x = 0;
-            coordenadasPecas[0].y = 0;           
-            coordenadasPecas[1].x = 1;
-            coordenadasPecas[1].y = 0;
-            coordenadasPecas[2].x = -1;
-            coordenadasPecas[2].y = 1;
-            coordenadasPecas[3].x = 0;
-            coordenadasPecas[3].y = 1;
+            coordenadasPecas[0] = new Point (0, 0);
+            coordenadasPecas[1] = new Point (1, 0);
+            coordenadasPecas[2] = new Point (-1, 1);
+            coordenadasPecas[3] = new Point (0, 1);            
+            
             break;
             
         case S_INVERTIDO:
             maxOrientation = 2;
             color = new Color(Integer.parseInt("f4adff", 16));
-            
-            coordenadasPecas[0].x = -1;
-            coordenadasPecas[0].y = 0;           
-            coordenadasPecas[1].x = 0;
-            coordenadasPecas[1].y = 0;
-            coordenadasPecas[2].x = 0;
-            coordenadasPecas[2].y = 1;
-            coordenadasPecas[3].x = 1;
-            coordenadasPecas[3].y = 1;            
+            coordenadasPecas[0] = new Point (-1, 0);
+            coordenadasPecas[1] = new Point (0, 0);
+            coordenadasPecas[2] = new Point (0, 1);
+            coordenadasPecas[3] = new Point (1, 1);
+                      
             break;
             
         case L:
             maxOrientation = 4;
             color = new Color(Integer.parseInt("c0b6fa", 16));
+            coordenadasPecas[0] = new Point (-1, 0);
+            coordenadasPecas[1] = new Point (0, 0);
+            coordenadasPecas[2] = new Point (1, 0);
+            coordenadasPecas[3] = new Point (1, 1);
             
-            coordenadasPecas[0].x = -1;
-            coordenadasPecas[0].y = 0;           
-            coordenadasPecas[1].x = 0;
-            coordenadasPecas[1].y = 0;
-            coordenadasPecas[2].x = 1;
-            coordenadasPecas[2].y = 0;
-            coordenadasPecas[3].x = 1;
-            coordenadasPecas[3].y = 1;
             break;
             
         case L_INVERTIDO:
             maxOrientation = 4;
             color = new Color(Integer.parseInt("f5f4a7", 16));
+            coordenadasPecas[0] = new Point (-1, 0);
+            coordenadasPecas[1] = new Point (0, 0);
+            coordenadasPecas[2] = new Point (1, 0);
+            coordenadasPecas[3] = new Point (-1, 1);
             
-            coordenadasPecas[0].x = -1;
-            coordenadasPecas[0].y = 0;           
-            coordenadasPecas[1].x = 0;
-            coordenadasPecas[1].y = 0;
-            coordenadasPecas[2].x = 1;
-            coordenadasPecas[2].y = 0;
-            coordenadasPecas[3].x = -1;
-            coordenadasPecas[3].y = 1;
             break;
             
         case T:
             maxOrientation = 4;
             color = new Color(Integer.parseInt("a4d9b6", 16));
+            coordenadasPecas[0] = new Point (-1, 0);
+            coordenadasPecas[1] = new Point (0, 0);
+            coordenadasPecas[2] = new Point (1, 0);
+            coordenadasPecas[3] = new Point (0, 1);
             
-            coordenadasPecas[0].x = -1;
-            coordenadasPecas[0].y = 0;           
-            coordenadasPecas[1].x = 0;
-            coordenadasPecas[1].y = 0;
-            coordenadasPecas[2].x = 1;
-            coordenadasPecas[2].y = 0;
-            coordenadasPecas[3].x = 0;
-            coordenadasPecas[3].y = 1;
             break;
             
         default :
