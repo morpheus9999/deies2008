@@ -418,7 +418,7 @@ public class Gui {
         } else if (figure.hasLanded()) {
             handleFigureLanded();
         } else {
-            figure.moveDown();
+            figure.deslocarPeca(0);
         }
     }
 
@@ -463,11 +463,11 @@ public class Gui {
         switch (e.getKeyCode()) {
 
         case KeyEvent.VK_LEFT:
-            figure.moveLeft();
+            figure.deslocarPeca(-1);
             break;
 
         case KeyEvent.VK_RIGHT:
-            figure.moveRight();
+            figure.deslocarPeca(1);
             break;
 
         case KeyEvent.VK_SPACE:
