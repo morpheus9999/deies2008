@@ -17,7 +17,7 @@ public class Arranque extends Applet {
     public static void main (String[] args) {
         JFrame frame = new JFrame("Tetris");
         Gui game = new Gui(false);
-        frame.add(game.getComponent());
+        frame.add(game.getComponente());
         frame.pack();
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -54,11 +54,11 @@ public class Arranque extends Applet {
 		game.setAppletContext(getAppletContext());
       
         setLayout(new BorderLayout());
-        add(game.getComponent(), "Center");
+        add(game.getComponente(), "Center");
     }
 
     public void stop() {
-        game.quit();
+        game.sair();
     }
     
 }

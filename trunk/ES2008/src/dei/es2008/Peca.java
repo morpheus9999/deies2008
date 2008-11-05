@@ -246,7 +246,7 @@ public class Peca {
     /**
      * Devolve o valor actual da rotacao de modo a sabermos em que posicao se encontra peca.
      */
-    public int getRotation() {
+    public int getRotacao() {
         return numeroRotacao;
     }
     
