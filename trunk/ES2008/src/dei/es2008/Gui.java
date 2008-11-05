@@ -19,6 +19,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.prefs.Preferences;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -31,7 +32,15 @@ public class Gui {
    
    /** @pdRoleInfo migr=no name=ControladorDeJogo assc=association2 mult=1..1 */
    public ControladorDeJogo controladorDeJogo;
-   
+   private Peca figure = null;
+   private Peca nextFigure = null;
+   private boolean moveLock = false;
+   private int nextRotation = 0;
+   /**
+     * The figure preview flag. If this flag is set, the figure
+     * will be shown in the figure preview board.
+     */
+    private boolean showPreview = true;
    /**
      * The graphical game component. This component is created on the first call to getComponent().
      */
@@ -39,6 +48,17 @@ public class Gui {
    
    public Mundo mundo;
    
+   /**
+	 * Used for storing the high score in application mode.
+	 */
+	private Preferences prefRoot = null;
+   
+   
+    /**
+     * The preview square board. This board is used to display a preview of the figures.
+     */
+    private Mundo mundoAnterior = new Mundo(5, 5);
+    private GameThread thread = null;
    
    public void Gui(){
         
@@ -93,24 +113,206 @@ public class Gui {
    public void pausarJogo() {
       // TODO: implement
    }
+   /**
+     * Handles a level modification event. This will modify the level
+     * label and adjust the thread speed.
+     */
+    private void handleLevelModification() {
+        component.levelLabel.setText("Level: " + level);
+        thread.adjustSpeed();
+    }
+    /**
+     * Handle a score modification event. This will modify the score label.
+     */
+    private void handleScoreModification() {
+        component.scoreLabel.setText("Score: " + score);
+    }
+   private void handleStart() {
+
+        // Reset score and figures
+        
+        
+        figure = null;
+        nextFigure = randomFigure();
+          
+
+        // Reset components
+        mundo.setMessage(null);
+        mundo.clear();
+        mundoAnterior.clear();
+        handleLevelModification();
+        handleScoreModification();
+        component.button.setLabel("Pause");
+
+        // Start game thread
+        //thread.reset();
+    }
+   private Peca randomFigure() {
+       //ver isto na peca
+        return figures[(int) (Math.random() * figures.length)];
+    }
    
    
+   
+   /**
+     * Handles a figure landed event. This will check that the figure
+     * is completely visible, or a game over event will be launched.
+     * After this control, any full lines will be removed. If no full
+     * lines could be removed, a figure start event is launched directly.
+     */
+
+    private void handleFigureLanded() {
+
+        // Check and detach figure
+        if (figure.isAllVisible()) {
+			// 10 points per level if a figure has been dropped
+			if (figure.numRowsFallen() > 0)
+				score += mundo.getNivel() * 10;
+			// ... and some extra points for each row of height
+            score += mundo.getNivel() * figure.numRowsFallen();
+        } else {
+            handleGameOver();
+            return;
+        }
+        figure.detach();
+        figure = null;
+
+		// a few extra points if the preview is turned off
+		if (!showPreview)
+			score += mundo.getNivel();
+
+        // Check for full lines or create new figure
+		int fullLines = mundo.getFullLines();
+        if (fullLines > 0) {
+            mundo.removeFullLines();
+			// adjust score: removing a full lines nets 10 points for a single line,
+			// 20 more for the second, 30 more for the third, and 40 more for the fourth
+			switch (fullLines) {
+				case 1:
+					score += mundo.getNivel() * 10;
+					break;
+				case 2:
+					score += mundo.getNivel() * 30;
+					break;
+				case 3:
+					score += mundo.getNivel() * 60;
+					break;
+				case 4:
+					score += mundo.getNivel() * 100;
+					break;
+			}
+            if (mundo.getNivel() < 9 && mundo.getRemovedLines() / 20 > mundo.getNivel()) {
+                mundo.getNivel() = mundo.getRemovedLines() / 20;
+                handleLevelModification();
+            }
+        } else {
+            handleFigureStart();
+        }
+
+		handleScoreModification();
+    }
    /**
      * Handles a timer event. This will normally move the figure down
      * one step, but when a figure has landed or isn't ready other 
      * events will be launched. This method is synchronized to avoid 
      * race conditions with other asynchronous events (keyboard and mouse).
      */
+   //DEPOIS VER ESTE
     private synchronized void handleTimer() {
+        
         if (figure == null) {
             handleFigureStart();
         } else if (figure.hasLanded()) {
             handleFigureLanded();
         } else {
-            figure.moveDown();
+            figure.deslocarPeca(0);
         }
     }
-   /**
+    /**
+     * Handles a figure start event. This will move the next figure
+     * to the current figure position, while also creating a new 
+     * preview figure. If the figure cannot be introduced onto the
+     * game board, a game over event will be launched.
+     */
+    private void handleFigureStart() {
+        int  rotation;
+
+        // Move next figure to current
+        figure = nextFigure;
+        moveLock = false;
+        rotation = nextRotation;
+        nextFigure = randomFigure();
+        nextFigure.rotateRandom();
+        nextRotation = nextFigure.getRotation(); 
+
+        // Handle figure preview
+        if (showPreview) {
+            mundoAnterior.clear(); 
+            nextFigure.attach(mundoAnterior, true);
+            nextFigure.detach();
+        }
+
+        // Attach figure to game board
+        figure.setRotation(rotation);
+        if (!figure.attach(mundo, false)) {
+            mundoAnterior.clear();
+            figure.attach(mundoAnterior, true);
+            figure.detach();
+            handleGameOver();
+        }
+    }
+   
+    /**
+     * Handles a game over event. This will stop the game thread,
+     * reset all figures and print a game over message.
+     */
+    private void handleGameOver() {
+
+        // Stop game thred
+        thread.setPaused(true);
+
+        // Reset figures
+        if (figure != null) {
+            figure.detach();
+        }
+        figure = null;
+        if (nextFigure != null) {
+            nextFigure.detach();
+        }
+        nextFigure = null;
+
+        // Handle components
+        mundo.setMessage("Game Over");
+        component.button.setLabel("Start");
+
+		handleHighScoreModification();
+
+		if (! isApplet) try {
+			prefRoot.putBoolean("showPreview", showPreview);
+			prefRoot.flush();
+		} catch (Exception ex) { }
+    }
+    
+    /**
+     * Handles a game resume event. This will resume the game thread 
+     * and remove any messages on the game board.
+     */
+    private void handleResume() {
+        mundo.setMessage(null);
+        component.button.setLabel("Pause");
+        thread.setPaused(false);
+    }
+    
+    /**
+     * Handles a game pause event. This will pause the game thread and
+     * print a pause message on the game board.
+     */
+    private void handlePause() {
+        thread.setPaused(true);
+        mundo.setMessage("Paused");
+        component.button.setLabel("Resume");
+    }
+    /**
      * Handles a button press event. This will launch different events
      * depending on the state of the game, as the button semantics
      * change as the game changes. This method is synchronized to 
@@ -152,29 +354,29 @@ public class Gui {
         switch (e.getKeyCode()) {
 
         case KeyEvent.VK_LEFT:
-            figure.moveLeft();
+            figure.deslocarPeca(-1);
             break;
 
         case KeyEvent.VK_RIGHT:
-            figure.moveRight();
+            figure.deslocarPeca(1);
             break;
 
         case KeyEvent.VK_SPACE:
-            figure.moveAllWayDown();
+            figure.deslocarPeca(0);
             moveLock = true;
             break;
 
         case KeyEvent.VK_UP:
-			figure.rotateClockwise();
+			figure.rodarPeca();
 			break;
 
-        case KeyEvent.VK_DOWN:
-			figure.rotateCounterClockwise();
+//        case KeyEvent.VK_DOWN:
+//			figure.rotateCounterClockwise();
             break;
 
         case KeyEvent.VK_S:
-            if (level < 9) {
-                level++;
+            if (mundo.getNivel() < 9) {
+                mundo.adicionarNivel(1);
                 handleLevelModification();
             }
             break;
@@ -182,17 +384,109 @@ public class Gui {
         case KeyEvent.VK_N:
             showPreview = !showPreview;
             if (showPreview && figure != nextFigure) {
-                nextFigure.attach(previewBoard, true);
+                nextFigure.attach(mundoAnterior, true);
                 nextFigure.detach(); 
             } else {
-                previewBoard.clear();
+                mundoAnterior.clear();
             }
             break;
         }
     }
    
-   
-   
+   /**
+     * The game time thread. This thread makes sure that the timer
+     * events are launched appropriately, making the current figure 
+     * fall. This thread can be reused across games, but should be set
+     * to paused state when no game is running.
+     */
+    private class GameThread extends Thread {
+
+        /**
+         * The game pause flag. This flag is set to true while the game should pause.
+         */
+        private boolean paused = true;
+
+        /**
+         * The number of milliseconds to sleep before each automatic
+         * move. This number will be lowered as the game progresses.
+         */
+        private int sleepTime = 500;
+
+        /**
+         * Creates a new game thread with default values.
+         */
+        public GameThread() {
+        }
+
+        /**
+         * Resets the game thread. This will adjust the speed and 
+         * start the game thread if not previously started.
+         */
+        public void reset() {
+            adjustSpeed();
+            setPaused(false);
+            if (!isAlive()) {
+                this.start();
+            }
+        }
+
+        /**
+         * Checks if the thread is paused.
+         * 
+         * @return true if the thread is paused, or false otherwise
+         */
+        public boolean isPaused() {
+            return paused;
+        }
+
+        /**
+         * Sets the thread pause flag.
+         * 
+         * @param paused     the new paused flag value
+         */
+        public void setPaused(boolean paused) {
+            this.paused = paused;
+        }
+
+        /**
+         * Adjusts the game speed according to the current level. The 
+         * sleeping time is calculated with a function making larger 
+         * steps initially an smaller as the level increases. A level 
+         * above ten (10) doesn't have any further effect.
+         */
+        public void adjustSpeed() {
+            sleepTime = 4500 / (mundo.getNivel() + 5) - 250;
+            if (sleepTime < 50) {
+                sleepTime = 50;
+            }
+        }
+
+        /**
+         * Runs the game.
+         */
+        public void run() {
+            while (thread == this) {
+                // Make the time step
+                handleTimer();
+
+                // Sleep for some time
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException ignore) {
+                    // Do nothing
+                }
+
+                // Sleep if paused
+                while (paused && thread == this) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ignore) {
+                        // Do nothing
+                    }
+                }
+            }
+        }
+    }
    /**
      * A game panel component. Contains all the game components.
      */
@@ -274,7 +568,7 @@ public class Gui {
             c.weightx = 1.0;
             c.weighty = 1.0;
             c.fill = GridBagConstraints.BOTH;
-            this.add(board.getComponent(), c);
+            this.add(mundo.getComponent(), c);
 
             // Add next figure board
             c = new GridBagConstraints();
@@ -284,7 +578,7 @@ public class Gui {
             c.weighty = 0.18;
             c.fill = GridBagConstraints.BOTH;
             c.insets = new Insets(15, 15, 0, 15);
-            this.add(previewBoard.getComponent(), c);
+            this.add(mundoAnterior.getComponent(), c);
 
             // Add score label
             scoreLabel.setBackground(Color.white);
@@ -370,9 +664,9 @@ public class Gui {
             int        unitSize;
             
             // Calculate the unit size
-            size = board.getComponent().getSize();
-            size.width /= board.getBoardWidth();
-            size.height /= board.getBoardHeight();
+            size = mundo.getComponent().getSize();
+            size.width /= mundo.getBoardWidth();
+            size.height /= mundo.getBoardHeight();
             if (size.width > size.height) {
                 unitSize = size.height;
             } else {
