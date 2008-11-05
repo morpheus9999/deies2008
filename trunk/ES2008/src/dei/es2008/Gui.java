@@ -140,7 +140,7 @@ public class Gui {
      */
     public Gui (int width, int height) {
         board = new Mundo(width, height);
-        board.setMessage("Iniciar");
+        board.setMensagem("Iniciar");
         thread = new GameThread();
     }
 
@@ -188,9 +188,9 @@ public class Gui {
         nextRotation = nextFigure.getRotation();  
 
         // Reset components
-        board.setMessage(null);
-        board.clear();
-        previewBoard.clear();
+        board.setMensagem(null);
+        board.limpa();
+        previewBoard.limpa();
         handleLevelModification();
         handleScoreModification();
         component.button.setLabel("Pausa");
@@ -219,7 +219,7 @@ public class Gui {
         nextFigure = null;
 
         // Handle components
-        board.setMessage("Game Over");
+        board.setMensagem("Game Over");
         component.button.setLabel("Iniciar");
 
 		handleHighScoreModification();
@@ -236,7 +236,8 @@ public class Gui {
      */
     private void handlePause() {
         thread.setPaused(true);
-        board.setMessage("Pausado");
+        
+        board.setMensagem("Pausado");
         component.button.setLabel("Retomar");
     }
 
@@ -245,7 +246,7 @@ public class Gui {
      * and remove any messages on the game board.
      */
     private void handleResume() {
-        board.setMessage(null);
+        board.setMensagem(null);
         component.button.setLabel("Pausar");
         thread.setPaused(false);
     }
@@ -306,7 +307,7 @@ public class Gui {
 
         // Handle figure preview
         if (showPreview) {
-            previewBoard.clear(); 
+            previewBoard.limpa(); 
             nextFigure.attach(previewBoard, true);
             nextFigure.detach();
         }
@@ -314,7 +315,7 @@ public class Gui {
         // Attach figure to game board
         figure.setRotacao(rotation);
         if (!figure.attach(board, false)) {
-            previewBoard.clear();
+            previewBoard.limpa();
             figure.attach(previewBoard, true);
             figure.detach();
             handleGameOver();
@@ -349,9 +350,9 @@ public class Gui {
 			score += level;
 
         // Check for full lines or create new figure
-		int fullLines = board.getFullLines();
+		int fullLines = board.getLinhasCompletas();
         if (fullLines > 0) {
-            board.removeFullLines();
+            board.removeLinhasCompletas();
 			// adjust score: removing a full lines nets 10 points for a single line,
 			// 20 more for the second, 30 more for the third, and 40 more for the fourth
 			switch (fullLines) {
@@ -368,8 +369,8 @@ public class Gui {
 					score += level * 100;
 					break;
 			}
-            if (level < 9 && board.getRemovedLines() / 20 > level) {
-                level = board.getRemovedLines() / 20;
+            if (level < 9 && board.getLinhasRemovidas() / 20 > level) {
+                level = board.getLinhasRemovidas() / 20;
                 handleLevelModification();
             }
         } else {
@@ -471,7 +472,7 @@ public class Gui {
                 nextFigure.attach(previewBoard, true);
                 nextFigure.detach(); 
             } else {
-                previewBoard.clear();
+                previewBoard.limpa();
             }
             break;
         }
@@ -650,7 +651,7 @@ public class Gui {
             c.weightx = 1.0;
             c.weighty = 1.0;
             c.fill = GridBagConstraints.BOTH;
-            this.add(board.getComponent(), c);
+            this.add(board.getComponente(), c);
 
             // Add next figure board
             c = new GridBagConstraints();
@@ -660,7 +661,7 @@ public class Gui {
             c.weighty = 0.18;
             c.fill = GridBagConstraints.BOTH;
             c.insets = new Insets(15, 15, 0, 15);
-            this.add(previewBoard.getComponent(), c);
+            this.add(previewBoard.getComponente(), c);
 
             // Add score label
             scoreLabel.setBackground(Color.white);
@@ -746,9 +747,9 @@ public class Gui {
             int        unitSize;
             
             // Calculate the unit size
-            size = board.getComponent().getSize();
-            size.width /= board.getBoardWidth();
-            size.height /= board.getBoardHeight();
+            size = board.getComponente().getSize();
+            size.width /= board.getLarguraTabuleiro();
+            size.height /= board.getAlturaTabuleiro();
             if (size.width > size.height) {
                 unitSize = size.height;
             } else {
