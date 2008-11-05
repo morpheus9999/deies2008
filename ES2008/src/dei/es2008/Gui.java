@@ -1,19 +1,3 @@
-/*
- * @(#)Game.java
- *
- * This work is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
- * the License, or (at your option) any later version.
- *
- * This work is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * Copyright (c) 2003 Per Cederberg. All rights reserved.
- */
-
 package dei.es2008;
 
 import java.applet.AppletContext;
@@ -23,19 +7,11 @@ import java.io.*;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 
-/**
- * The Tetris game. This class controls all events in the game and
- * handles all the game logics. The game is started through user
- * interaction with the graphical game component provided by this class.
- *
- * @version  1.2
- * @author   Per Cederberg, per@percederberg.net
- */
 
 public class Gui {
 
     /**
-     * The main square board. This board is used for the game itself.
+     * Cria objecto da class Mundo para uso
      */
     private Mundo board = null;
 
@@ -45,10 +21,7 @@ public class Gui {
     private Mundo previewBoard = new Mundo(5, 5);
 
     /**
-     * The figures used on both boards. All figures are reutilized in 
-     * order to avoid creating new objects while the game is running.
-     * Special care has to be taken when the preview figure and the
-     * current figure refers to the same object.
+     * Cria as objectos da class Peca que podem ser reutilizados
      */
     private Peca[] figures = {
         new Peca(Peca.QUADRADO),
@@ -264,7 +237,7 @@ public class Gui {
     private void handlePause() {
         thread.setPaused(true);
         board.setMessage("Pausado");
-        component.button.setLabel("Retomar Jogo");
+        component.button.setLabel("Retomar");
     }
 
     /**
@@ -552,11 +525,7 @@ public class Gui {
             }
         }
 
-        /**
-         * Checks if the thread is paused.
-         * 
-         * @return true if the thread is paused, or false otherwise
-         */
+        
         public boolean isPaused() {
             return paused;
         }
