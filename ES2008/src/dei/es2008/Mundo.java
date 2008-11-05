@@ -79,6 +79,20 @@ public class Mundo extends Object {
     }
 
     /**
+     * Checks if the board contains any full lines.
+     *
+     * @return the number of full lines
+     */
+    public int getFullLines() {
+		int fullLines = 0;
+        for (int y = height - 1; y >= 0; y--) {
+            if (isLineFull(y)) {
+				fullLines++;
+            }
+        }
+        return fullLines;
+    }
+    /**
      * Checks if a specified square is empty, i.e. if it is not 
      * marked with a color. If the square is outside the board, 
      * false will be returned in all cases except when the square is 
