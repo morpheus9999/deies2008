@@ -7,44 +7,36 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 /**
- * This class represents the high score list. It implements a Swing ListModel for
- * display purposes, and knows how convert a high score list to and from a string
- * (which is suitable for storing with the Preferences API or applet streams).
- *
- * @author   Ulf Dittmer
+ * Classe responsavel pela manipulacao do ranking
  */
 
 public class Ranking implements ListModel {
 
-	// the number of scores to keep track of;
-	// note that the 'scores' list can be shorter, if there aren't that many scores yet
-	private int numScores = 10;
-
-	// a list of 'Score' objects, sorted by score in descending order
-	private List scores;
+	private int numPontucoes = 10;
+	private List pontuacoes;
 
 	public Ranking() {
 		this(10);
 	}
 
-	public Ranking (int numScores) {
-		this.numScores = numScores;
-		scores = new ArrayList();
+	public Ranking (int numPontucoes) {
+		this.numPontucoes = numPontucoes;
+		pontuacoes = new ArrayList();
 	}
 
-	public boolean putScore (int score) {
-		if (scores.size() == 0) {
-			scores.add(new Score(score, new Date()));
+	public boolean inserePontuacao (int pontuacao) {
+		if (pontuacoes.size() == 0) {
+			pontuacoes.add(new Pontuacao(pontuacao, new Date()));
 			notifyListeners();
 			return true;
 		}
 
-		for (int i=0; i<scores.size(); i++) {
-			Score sc = (Score) scores.get(i);
-			if (score > sc.getScore()) {
-				scores.add(i, new Score(score, new Date()));
-				if (scores.size() > numScores)
-					scores.remove(scores.size()-1);
+		for (int i=0; i<pontuacoes.size(); i++) {
+			Pontuacao sc = (Pontuacao) pontuacoes.get(i);
+			if (pontuacao > sc.getPontuacao()) {
+				pontuacoes.add(i, new Pontuacao(pontuacao, new Date()));
+				if (pontuacoes.size() > numPontucoes)
+					pontuacoes.remove(pontuacoes.size()-1);
 				
 				notifyListeners();
 				return true;
@@ -53,23 +45,21 @@ public class Ranking implements ListModel {
 		return false;
 	}
 
-	// notify listeners; there generally is only a single one
 	private void notifyListeners() {
 		Iterator iter = listeners.iterator();
 		while (iter.hasNext()) {
 			((ListDataListener) iter.next()).contentsChanged(
-				new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, numScores-1));
-			// yeah, we could be more specific about which elements have been updated
+				new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, 0, numPontucoes-1));
 		}
 	}
 
-	public String getSerializedScores() {
+	public String getSerializedPontuacoes() {
 		StringBuffer sb = new StringBuffer(500);
-		sb.append(numScores);
-		for (int i=0; i<scores.size(); i++) {
-			Score sc = (Score) scores.get(i);
-			Date dt = sc.getDate();
-			sb.append(",").append(sc.getScore());
+		sb.append(numPontucoes);
+		for (int i=0; i<pontuacoes.size(); i++) {
+			Pontuacao sc = (Pontuacao) pontuacoes.get(i);
+			Date dt = sc.getData();
+			sb.append(",").append(sc.getPontuacao());
 			sb.append(",").append(dt.getYear());
 			sb.append(",").append(dt.getMonth());
 			sb.append(",").append(dt.getDate());
@@ -77,24 +67,23 @@ public class Ranking implements ListModel {
 		return sb.toString();
 	}
 
-	public void setSerializedScores (String serializedScores) {
-		String[] parts = serializedScores.split(",");
-		scores.clear();
-		numScores = Integer.parseInt(parts[0]);
+	public void setSerializedPontuacoes (String serializedPontuacoes) {
+		String[] parts = serializedPontuacoes.split(",");
+		pontuacoes.clear();
+		numPontucoes = Integer.parseInt(parts[0]);
 		for (int i=1; i<parts.length; i+=4) {
-			scores.add(new Score(Integer.parseInt(parts[i]),
+			pontuacoes.add(new Pontuacao(Integer.parseInt(parts[i]),
 						new Date(Integer.parseInt(parts[i+1]),
 								Integer.parseInt(parts[i+2]),
 								Integer.parseInt(parts[i+3]))));
 		}
 	}
 
-	// the following methods implement the ListModel interface
 	public Object getElementAt (int index) {
-		if (index < scores.size()) {
-			Score sc = (Score) scores.get(index);
-			Date dt = sc.getDate();
-			String str = ""+sc.getScore();
+		if (index < pontuacoes.size()) {
+			Pontuacao sc = (Pontuacao) pontuacoes.get(index);
+			Date dt = sc.getData();
+			String str = ""+sc.getPontuacao();
 			while (str.length() < 5)
 				str = " "+str;
 
@@ -111,7 +100,7 @@ public class Ranking implements ListModel {
 		}
 	}
 
-	public int getSize() { return numScores; }
+	public int getSize() { return numPontucoes; }
 
 	private Set listeners = new HashSet();
 
@@ -120,20 +109,21 @@ public class Ranking implements ListModel {
 	public void removeListDataListener (ListDataListener l) { listeners.remove(l); }
 
 	/**
-	 * This class represents a single score and the date on which it was achieved.
+	 * Esta classe representa o contrutor de uma pontuacao.
+         * Esta guarda o valor da pontuacao e associa a data a mesma.
 	 */
-	private class Score {
-		int score;
-		Date date;
+	private class Pontuacao {
+		int pontuacao;
+		Date data;
 
-		public Score (int score, Date date) {
-			this.score = score;
-			this.date = date;
+		public Pontuacao (int pontuacao, Date data) {
+			this.pontuacao = pontuacao;
+			this.data = data;
 		}
 
-		public int getScore() { return score; }
+		public int getPontuacao() { return pontuacao; }
 
-		public Date getDate() { return date; }
+		public Date getData() { return data; }
 	}
 }
 
