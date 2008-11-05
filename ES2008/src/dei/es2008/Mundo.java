@@ -14,66 +14,70 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.util.*;
+import java.util.Hashtable;
 
-/** @pdOid 57eceda6-9a90-4a28-a307-5068d2611aec */
-public class Mundo {
-   /** @pdOid 1930c0ed-cfa2-4350-838b-b0cc41bb0106 */
-   private Color[][] mundo;
-   /** @pdOid 82e42fd5-a340-4160-adda-750ebefe7409 */
-   public int pontuacao;
-   /** @pdOid 5d5a055b-5faf-41be-aaaf-01bc4decee64 */
-   public int nivel;
-   /** @pdOid 51b5257f-2a17-4dcf-a86b-8a1495c78586 */
-   private int tempoDecorrido;
-   /** @pdOid 9fdd7696-a5e7-4e3e-8bba-23852a85bdb6
-       @pdRoleInfo migr=yes name=Peca assc=association13 */
-   //private Peca peca=new Peca(this);
-   public int score;
+/**
+ * A Tetris square board. The board is rectangular and contains a grid
+ * of colored squares. The board is considered to be constrained to
+ * both sides (left and right), and to the bottom. There is no 
+ * constraint to the top of the board, although colors assigned to 
+ * positions above the board are not saved.
+ *
+ * @version  1.2
+ * @author   Per Cederberg, per@percederberg.net
+ */
+public class Mundo extends Object {
 
-   
-   /** @pdOid 062af6de-82ba-4a79-b5c3-52f9cf8d65cd */
-   private int height;
-   private int width;
-   private String  message = null;
-   private int  removedLines = 0;
-   
-   /**
+    /**
+     * The board width (in squares)
+     */
+    private int  width = 0;
+
+    /**
+     * The board height (in squares).
+     */
+    private int  height = 0;
+
+    /**
+     * The square board color matrix. This matrix (or grid) contains
+     * a color entry for each square in the board. The matrix is 
+     * indexed by the vertical, and then the horizontal coordinate.
+     */
+    private Color[][]  matrix = null;
+
+    /**
+     * An optional board message. The board message can be set at any
+     * time, printing it on top of the board.
+     */
+    private String  message = null;
+
+    /**
+     * The number of lines removed. This counter is increased each 
+     * time a line is removed from the board.
+     */
+    private int  removedLines = 0;
+
+    /**
      * The graphical sqare board component. This graphical 
-     * representation is created upon the first call to getComponent().
+     * representation is created upon the first call to 
+     * getComponent().
      */
     private SquareBoardComponent  component = null;
-   public Mundo(int width, int height) {
-        
-        this.mundo= new Color [height][width];
-        this.pontuacao=0;
-        
-    }
-   public Mundo() {
-        //ver valores que meti
-        this.mundo= new Color [10][30];
-        this.pontuacao=0;
-        
+
+    /**
+     * Creates a new square board with the specified size. The square
+     * board will initially be empty.
+     *
+     * @param width     the width of the board (in squares)
+     * @param height    the height of the board (in squares)
+     */
+    public Mundo(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.matrix = new Color[height][width];
+        clear();
     }
 
-    
-         /**
-     * Clears the board, i.e. removes all the colored squares. As 
-     * side-effects, the number of removed lines will be reset to 
-     * zero, and the component will be repainted immediately.
-     */
-    public void clear() {
-        removedLines = 0;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                this.mundo[y][x] = null;
-            }
-        }
-        if (component != null) {
-            component.redrawAll();
-        }
-    }
-    
     /**
      * Checks if a specified square is empty, i.e. if it is not 
      * marked with a color. If the square is outside the board, 
@@ -83,20 +87,195 @@ public class Mundo {
      * @param x         the horizontal position (0 <= x < width)
      * @param y         the vertical position (0 <= y < height)
      * 
-     * @return true if the square is emtpy, or false otherwise
+     * @return true if the square is emtpy, or
+     *         false otherwise
      */
     public boolean isSquareEmpty(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             return x >= 0 && x < width && y < 0;
         } else {
-            return mundo[y][x] == null;
+            return matrix[y][x] == null;
         }
     }
-    
+
+    /**
+     * Checks if a specified line is empty, i.e. only contains 
+     * empty squares. If the line is outside the board, false will
+     * always be returned.
+     *
+     * @param y         the vertical position (0 <= y < height)
+     * 
+     * @return true if the whole line is empty, or
+     *         false otherwise
+     */
+    public boolean isLineEmpty(int y) {
+        if (y < 0 || y >= height) {
+            return false;
+        }
+        for (int x = 0; x < width; x++) {
+            if (matrix[y][x] != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if a specified line is full, i.e. only contains no empty
+     * squares. If the line is outside the board, true will always be 
+     * returned.
+     *
+     * @param y         the vertical position (0 <= y < height)
+     * 
+     * @return true if the whole line is full, or
+     *         false otherwise
+     */
+    public boolean isLineFull(int y) {
+        if (y < 0 || y >= height) {
+            return true;
+        }
+        for (int x = 0; x < width; x++) {
+            if (matrix[y][x] == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the board contains any full lines.
+     *
+     * @return true if there are full lines on the board, or
+     *         false otherwise
+     */
+    public boolean hasFullLines() {
+        for (int y = height - 1; y >= 0; y--) {
+            if (isLineFull(y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns a graphical component to draw the board. The component 
+     * returned will automatically be updated when changes are made to
+     * this board. Multiple calls to this method will return the same
+     * component, as a square board can only have a single graphical
+     * representation.
+     * 
+     * @return a graphical component that draws this board
+     */
+    public Component getComponent() {
+        if (component == null) {
+            component = new SquareBoardComponent();
+        }
+        return component;
+    }
+
+    /**
+     * Returns the board height (in squares). This method returns, 
+     * i.e, the number of vertical squares that fit on the board.
+     * 
+     * @return the board height in squares
+     */
+    public int getBoardHeight() {
+        return height;
+    }
+
+    /**
+     * Returns the board width (in squares). This method returns, i.e,
+     * the number of horizontal squares that fit on the board.
+     * 
+     * @return the board width in squares
+     */
+    public int getBoardWidth() {
+        return width;
+    }
+
+    /**
+     * Returns the number of lines removed since the last clear().
+     * 
+     * @return the number of lines removed since the last clear call
+     */
+    public int getRemovedLines() {
+        return removedLines;
+    }
+
+    /**
+     * Returns the color of an individual square on the board. If the 
+     * square is empty or outside the board, null will be returned.
+     *
+     * @param x         the horizontal position (0 <= x < width)
+     * @param y         the vertical position (0 <= y < height)
+     * 
+     * @return the square color, or null for none
+     */
+    public Color getSquareColor(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return null;
+        } else {
+            return matrix[y][x];
+        }
+    }
+
+    /**
+     * Changes the color of an individual square on the board. The 
+     * square will be marked as in need of a repaint, but the 
+     * graphical component will NOT be repainted until the update() 
+     * method is called.
+     *
+     * @param x         the horizontal position (0 <= x < width)
+     * @param y         the vertical position (0 <= y < height)
+     * @param color     the new square color, or null for empty
+     */
+    public void setSquareColor(int x, int y, Color color) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return;
+        }
+        matrix[y][x] = color;
+        if (component != null) {
+            component.invalidateSquare(x, y);
+        }
+    }
+
+    /**
+     * Sets a message to display on the square board. This is supposed 
+     * to be used when the board is not being used for active drawing, 
+     * as it slows down the drawing considerably.
+     *
+     * @param message  a message to display, or null to remove a
+     *                 previous message
+     */
+    public void setMessage(String message) {
+        this.message = message;
+        if (component != null) {
+            component.redrawAll();
+        }
+    }
+
+    /**
+     * Clears the board, i.e. removes all the colored squares. As 
+     * side-effects, the number of removed lines will be reset to 
+     * zero, and the component will be repainted immediately.
+     */
+    public void clear() {
+        removedLines = 0;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                this.matrix[y][x] = null;
+            }
+        }
+        if (component != null) {
+            component.redrawAll();
+        }
+    }
+
     /**
      * Removes all full lines. All lines above a removed line will be 
-     * moved downward one step, and a new empty line will be added at the top.
-	 * After removing all full lines, the component will be repainted.
+     * moved downward one step, and a new empty line will be added at 
+     * the top. After removing all full lines, the component will be 
+     * repainted.
      * 
      * @see #hasFullLines
      */
@@ -118,7 +297,7 @@ public class Mundo {
             component.redrawAll();
         }
     }
-    
+
     /**
      * Removes a single line. All lines above are moved down one step, 
      * and a new empty line is added at the top. No repainting will be 
@@ -132,74 +311,14 @@ public class Mundo {
         }
         for (; y > 0; y--) {
             for (int x = 0; x < width; x++) {
-                mundo[y][x] = mundo[y - 1][x];
+                matrix[y][x] = matrix[y - 1][x];
             }
         }
         for (int x = 0; x < width; x++) {
-            mundo[0][x] = null;
+            matrix[0][x] = null;
         }
     }
 
-    /**
-     * Returns the number of lines removed since the last clear().
-     * 
-     * @return the number of lines removed since the last clear call
-     */
-    public int getRemovedLines() {
-        return removedLines;
-    }
-    /**
-     * Checks if a specified line is full, i.e. only contains no empty squares.
-	 * If the line is outside the board, true will always be returned.
-     *
-     * @param y         the vertical position (0 <= y < height)
-     * 
-     * @return true if the whole line is full, or false otherwise
-     */
-    public boolean isLineFull(int y) {
-        if (y < 0 || y >= height) {
-            return true;
-        }
-        for (int x = 0; x < width; x++) {
-            if (mundo[y][x] == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-    /**
-     * Checks if the board contains any full lines.
-     *
-     * @return the number of full lines
-     */
-    public int getFullLines() {
-		int fullLines = 0;
-        for (int y = height - 1; y >= 0; y--) {
-            if (isLineFull(y)) {
-				fullLines++;
-            }
-        }
-        return fullLines;
-    }
-    
-    /**
-     * Changes the color of an individual square on the board. The 
-     * square will be marked as in need of a repaint, but the 
-     * graphical component will NOT be repainted until the update() method is called.
-     *
-     * @param x         the horizontal position (0 <= x < width)
-     * @param y         the vertical position (0 <= y < height)
-     * @param color     the new square color, or null for empty
-     */
-    public void setSquareColor(int x, int y, Color color) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
-            return;
-        }
-        mundo[y][x] = color;
-        if (component != null) {
-            component.invalidateSquare(x, y);
-        }
-    }
     /**
      * Updates the graphical component. Any squares previously changed 
      * will be repainted by this method.
@@ -207,83 +326,15 @@ public class Mundo {
     public void update() {
         component.redraw();
     }
-     /**
-     * Sets a message to display on the square board. This is supposed 
-     * to be used when the board is not being used for active drawing, 
-     * as it slows down the drawing considerably.
-     *
-     * @param message  a message to display, or null to remove a
-     *                 previous message
+
+
+    /**
+     * The graphical component that paints the square board. This is
+     * implemented as an inner class in order to better abstract the 
+     * detailed information that must be sent between the square board
+     * and its graphical representation.
      */
-    public void setMessage(String message) {
-        this.message = message;
-        if (component != null) {
-            component.redrawAll();
-        }
-    }
-
-    void adicionarNivel(int i) {
-        this.nivel=this.nivel+i;
-    }
-
-    int getNivel() {
-        return this.nivel;
-    }
-   private void fundePeca() {
-      // TODO: implement
-       
-   }
-   
-   /** @pdOid 9f0aea09-9310-488a-adff-645bb653980b */
-   private Boolean verificaLinha() {
-      // TODO: implement
-      return null;
-   }
-   
-   /** @pdOid 01d5a05a-ff10-46e9-b85b-b987ff70d7e9 */
-   private Boolean apagaLinha() {
-      // TODO: implement
-      return null;
-   }
-   
-   /** @pdOid be259b16-d8a2-4172-8fe1-018e95856dd6 */
-   public Boolean adicionarPeca() {
-       
-      // TODO: implement
-      return true;
-   }
-   
-   /** @pdOid a76d8a35-d893-4c83-951a-ac9c822316ee */
-   public boolean verificaPosicaoPeca() {
-      // TODO: implement
-       return true;
-   }
-   
-   /** @pdOid 165c287f-14f4-4b2d-ab8d-722e596edfc5 */
-   public void rodarPeca() {
-      // TODO: implement
-   }
-   
-   /** @param direccao
-    * @pdOid 096d4194-4019-41f8-821c-576aa0ae5326 */
-   public void deslocarPeca(int direccao) {
-      // TODO: implement
-   }
-   public Component getComponent() {
-        if (component == null) {
-            component = new SquareBoardComponent();
-        }
-        return component;
-    }
-   
-   public int getBoardHeight() {
-        return height;
-    }
-   
-   public int getBoardWidth() {
-        return width;
-    }
-   private class SquareBoardComponent extends Component {
+    private class SquareBoardComponent extends Component {
 
         /**
          * The component size. If the component has been resized, that 
@@ -333,14 +384,14 @@ public class Mundo {
          * This table is used to avoid calculating the lighter 
          * versions of the colors for each and every square drawn.
          */
-        private Map  lighterColors = new HashMap();
+        private Hashtable  lighterColors = new Hashtable();
 
         /**
          * A lookup table containing darker versions of the colors.
          * This table is used to avoid calculating the darker
          * versions of the colors for each and every square drawn.
          */
-        private Map  darkerColors = new HashMap();
+        private Hashtable  darkerColors = new Hashtable();
 
         /**
          * A flag set when the component has been updated.
@@ -357,8 +408,10 @@ public class Mundo {
          * Creates a new square board component.
          */
         public SquareBoardComponent() {
-            setBackground(new Color(Integer.parseInt("000000", 16)));
-            messageColor = new Color(Integer.parseInt("ffffff", 16));
+            setBackground(Configuration.getColor("board.background", 
+                                                 "#000000"));
+            messageColor = Configuration.getColor("board.message", 
+                                                  "#ffffff");
         }
 
         /**
@@ -393,7 +446,8 @@ public class Mundo {
 
         /**
          * Redraws all the invalidated squares. If no squares have 
-         * been marked as in need of redrawing, no redrawing will occur.
+         * been marked as in need of redrawing, no redrawing will 
+         * occur.
          */
         public void redraw() {
             Graphics  g;
@@ -464,7 +518,8 @@ public class Mundo {
          * Returns a lighter version of the specified color. The 
          * lighter color will looked up in a hashtable, making this
          * method fast. If the color is not found, the ligher color 
-         * will be calculated and added to the lookup table for later reference.
+         * will be calculated and added to the lookup table for later
+         * reference.
          * 
          * @param c     the base color
          * 
@@ -485,7 +540,8 @@ public class Mundo {
          * Returns a darker version of the specified color. The 
          * darker color will looked up in a hashtable, making this
          * method fast. If the color is not found, the darker color 
-         * will be calculated and added to the lookup table for later reference.
+         * will be calculated and added to the lookup table for later
+         * reference.
          * 
          * @param c     the base color
          * 
@@ -527,22 +583,31 @@ public class Mundo {
                 insets.right = insets.left;
                 insets.top = 0;
                 insets.bottom = size.height - height * squareSize.height;
-                bufferImage = createImage(width * squareSize.width, height * squareSize.height);
+                bufferImage = createImage(width * squareSize.width, 
+                                          height * squareSize.height);
             }
 
             // Paint component in buffer image
             rect = g.getClipBounds();
             bufferGraphics = bufferImage.getGraphics();
-            bufferGraphics.setClip(rect.x - insets.left, rect.y - insets.top, rect.width, rect.height);
+            bufferGraphics.setClip(rect.x - insets.left, 
+                                   rect.y - insets.top, 
+                                   rect.width, 
+                                   rect.height);
             paintComponent(bufferGraphics);
 
             // Paint image buffer
-            g.drawImage(bufferImage, insets.left, insets.top, getBackground(), null);
+            g.drawImage(bufferImage, 
+                        insets.left,
+                        insets.top, 
+                        getBackground(), 
+                        null);
         }
 
         /**
          * Paints this component directly. All the squares on the 
-         * board will be painted directly to the specified graphics context.
+         * board will be painted directly to the specified graphics
+         * context.
          * 
          * @param g     the graphics context to use
          */
@@ -550,12 +615,15 @@ public class Mundo {
 
             // Paint background
             g.setColor(getBackground());
-            g.fillRect(0, 0, width * squareSize.width, height * squareSize.height);
+            g.fillRect(0, 
+                       0, 
+                       width * squareSize.width, 
+                       height * squareSize.height);
             
             // Paint squares
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    if (mundo[y][x] != null) {
+                    if (matrix[y][x] != null) {
                         paintSquare(g, x, y);
                     }
                 }
@@ -568,14 +636,15 @@ public class Mundo {
         }
 
         /**
-         * Paints a single board square. The specified position must contain a color object.
+         * Paints a single board square. The specified position must 
+         * contain a color object.
          *
          * @param g     the graphics context to use
          * @param x     the horizontal position (0 <= x < width)
          * @param y     the vertical position (0 <= y < height)
          */
         private void paintSquare(Graphics g, int x, int y) {
-            Color  color = mundo[y][x];
+            Color  color = matrix[y][x];
             int    xMin = x * squareSize.width;
             int    yMin = y * squareSize.height;
             int    xMax = xMin + squareSize.width - 1;
@@ -611,7 +680,8 @@ public class Mundo {
         }
 
         /**
-         * Paints a board message. The message will be drawn at the center of the component.
+         * Paints a board message. The message will be drawn at the
+         * center of the component.
          *
          * @param g     the graphics context to use
          * @param msg   the string message
@@ -647,5 +717,4 @@ public class Mundo {
             g.drawString(msg, x, y);
         }
     }
-
 }
