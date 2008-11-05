@@ -58,9 +58,16 @@ public class ControladorDeJogo {
     }
 
     /** @pdOid af659177-3570-4a70-a061-13d418c57cc9 */
-    public void inserirCodigo() {
-        // TODO: implement
+    public void inserirCodigo(int n) {
+        switch (n) {
+            case 2: /*meter a dificuldade a 2*/
+                ;
+            case 3:
+                ;
+            //etc...
+        }
     }
+    
 
     /** @param estado
      * @pdOid aa36fe23-641f-4d92-98dd-a68c2ccd9555 */
