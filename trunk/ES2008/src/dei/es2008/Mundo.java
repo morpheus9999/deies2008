@@ -21,14 +21,15 @@ public class Mundo {
    /** @pdOid 1930c0ed-cfa2-4350-838b-b0cc41bb0106 */
    private Color[][] mundo;
    /** @pdOid 82e42fd5-a340-4160-adda-750ebefe7409 */
-   private int pontuacao;
+   public int pontuacao;
    /** @pdOid 5d5a055b-5faf-41be-aaaf-01bc4decee64 */
-   private int nivel;
+   public int nivel;
    /** @pdOid 51b5257f-2a17-4dcf-a86b-8a1495c78586 */
    private int tempoDecorrido;
    /** @pdOid 9fdd7696-a5e7-4e3e-8bba-23852a85bdb6
        @pdRoleInfo migr=yes name=Peca assc=association13 */
-   private Peca peca=new Peca(this);
+   //private Peca peca=new Peca(this);
+   public int score;
    
    /** @pdOid 062af6de-82ba-4a79-b5c3-52f9cf8d65cd */
    private int height;
@@ -91,7 +92,94 @@ public class Mundo {
         }
     }
     
+    /**
+     * Removes all full lines. All lines above a removed line will be 
+     * moved downward one step, and a new empty line will be added at the top.
+	 * After removing all full lines, the component will be repainted.
+     * 
+     * @see #hasFullLines
+     */
+    public void removeFullLines() {
+        boolean repaint = false;
+
+        // Remove full lines
+        for (int y = height - 1; y >= 0; y--) {
+            if (isLineFull(y)) {
+                removeLine(y);
+                removedLines++;
+                repaint = true;
+                y++;
+            }
+        }
+
+        // Repaint if necessary
+        if (repaint && component != null) {
+            component.redrawAll();
+        }
+    }
     
+    /**
+     * Removes a single line. All lines above are moved down one step, 
+     * and a new empty line is added at the top. No repainting will be 
+     * done after removing the line.
+     *
+     * @param y         the vertical position (0 <= y < height)
+     */
+    private void removeLine(int y) {
+        if (y < 0 || y >= height) {
+            return;
+        }
+        for (; y > 0; y--) {
+            for (int x = 0; x < width; x++) {
+                mundo[y][x] = mundo[y - 1][x];
+            }
+        }
+        for (int x = 0; x < width; x++) {
+            mundo[0][x] = null;
+        }
+    }
+
+    /**
+     * Returns the number of lines removed since the last clear().
+     * 
+     * @return the number of lines removed since the last clear call
+     */
+    public int getRemovedLines() {
+        return removedLines;
+    }
+    /**
+     * Checks if a specified line is full, i.e. only contains no empty squares.
+	 * If the line is outside the board, true will always be returned.
+     *
+     * @param y         the vertical position (0 <= y < height)
+     * 
+     * @return true if the whole line is full, or false otherwise
+     */
+    public boolean isLineFull(int y) {
+        if (y < 0 || y >= height) {
+            return true;
+        }
+        for (int x = 0; x < width; x++) {
+            if (mundo[y][x] == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+    /**
+     * Checks if the board contains any full lines.
+     *
+     * @return the number of full lines
+     */
+    public int getFullLines() {
+		int fullLines = 0;
+        for (int y = height - 1; y >= 0; y--) {
+            if (isLineFull(y)) {
+				fullLines++;
+            }
+        }
+        return fullLines;
+    }
     
     /**
      * Changes the color of an individual square on the board. The 
