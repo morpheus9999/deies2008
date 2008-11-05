@@ -3,7 +3,7 @@
  * Author:  Filipe
  * Purpose: Defines the Class Mundo
  ***********************************************************************/
-//lalalalalala
+
 package dei.es2008;
 
 import java.awt.Color;
@@ -17,59 +17,54 @@ import java.awt.Rectangle;
 import java.util.Hashtable;
 
 /**
- * A Tetris square board. The board is rectangular and contains a grid
- * of colored squares. The board is considered to be constrained to
- * both sides (left and right), and to the bottom. There is no 
- * constraint to the top of the board, although colors assigned to 
- * positions above the board are not saved.
- *
- * @version  1.2
- * @author   Per Cederberg, per@percederberg.net
+ * Esta classe é o mundo, onde cria o tabuleiro de jogo e tem uma grelha com
+ * os quadrados coloridos.O tabuleiro está limitado em baixo e nos lados
+ * , apenas fica solto em cima onde a peça aparece faseadamente antes de entrar
+ * na totalidade no tabuleiro de jogo.
  */
 public class Mundo extends Object {
 
     /**
-     * The board width (in squares)
+     * A largura do tabuleiro(em quadrados).
      */
     private int  width = 0;
 
     /**
-     * The board height (in squares).
+     * A altura do tabuleiro (em quadrados).
      */
     private int  height = 0;
 
     /**
-     * The square board color matrix. This matrix (or grid) contains
-     * a color entry for each square in the board. The matrix is 
-     * indexed by the vertical, and then the horizontal coordinate.
+     * A matriz colorida do tabuleiro de jogo. Esta matriz contem uma entrada
+     * de cor para cada quadrado do tabuleiro. A matriz é indexada pela
+     * cordenada vertical e horizontal.
      */
     private Color[][]  mundo = null;
 
     /**
-     * An optional board message. The board message can be set at any
-     * time, printing it on top of the board.
+     * Mensagam opcional do tabuleiro. Esta mensagem pode ser accionada a
+     * qualquer altura, imprimindo o texto a meio do tabuleiro
      */
     private String  message = null;
 
     /**
-     * The number of lines removed. This counter is increased each 
-     * time a line is removed from the board.
+     * Contador para o número de linhas que o jogador conseguiu completar, é
+     * incrementado cada vez que o player completa uma linha.
      */
     private int  removedLines = 0;
 
     /**
-     * The graphical sqare board component. This graphical 
-     * representation is created upon the first call to 
-     * getComponent().
+     * Representação gráfica do tabuleiro de jogo. Esta componente gráfica
+     * é criada quando a chamada getComponent() é realizada.
      */
     private SquareBoardComponent  component = null;
 
     /**
-     * Creates a new square board with the specified size. The square
-     * board will initially be empty.
+     * Cria um novo tabuleiro de jogo com o tamanho designado. O tabuleiro vai
+     * começar vazio.
      *
-     * @param width     the width of the board (in squares)
-     * @param height    the height of the board (in squares)
+     * @param width     a largura do tabuleiro
+     * @param height    a altura do tabuleiro
      */
     public Mundo(int width, int height) {
         this.width = width;
@@ -79,8 +74,7 @@ public class Mundo extends Object {
     }
 
     /**
-     * Checks if the board contains any full lines.
-     *
+     * Verifica se o tabuleiro contém alguma linha cheia.
      * @return the number of full lines
      */
     public int getFullLines() {
@@ -93,16 +87,14 @@ public class Mundo extends Object {
         return fullLines;
     }
     /**
-     * Checks if a specified square is empty, i.e. if it is not 
-     * marked with a color. If the square is outside the board, 
-     * false will be returned in all cases except when the square is 
-     * directly above the board.
-     *
-     * @param x         the horizontal position (0 <= x < width)
-     * @param y         the vertical position (0 <= y < height)
+     * Verifica se um quadrado específico não tem cor, ou seja se tiver fora 
+     * do tabuleiro de jogo não tem cor e indica isso retornando false (excepto
+     * quando a peça se encontra acima do tabuleiro de jogo).
      * 
-     * @return true if the square is emtpy, or
-     *         false otherwise
+     * @param x         a posição horizontal (0 <= x < width)
+     * @param y         a posição vertical (0 <= y < height)
+     * 
+     * @return true se o quadrado for vazio (emtpy), falso em caso contrário
      */
     public boolean isSquareEmpty(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
@@ -113,14 +105,12 @@ public class Mundo extends Object {
     }
 
     /**
-     * Checks if a specified line is empty, i.e. only contains 
-     * empty squares. If the line is outside the board, false will
-     * always be returned.
-     *
-     * @param y         the vertical position (0 <= y < height)
+     * Verifica se uma determinada linha está vazia, se a linha estiver fora
+     * do tabuleiro vai ser retornado false.
      * 
-     * @return true if the whole line is empty, or
-     *         false otherwise
+     * @param y         a posição vertical (0 <= y < height)
+     * 
+     * @return true se toda a linha estiver vazia, e falso em caso contrário
      */
     public boolean isLineEmpty(int y) {
         if (y < 0 || y >= height) {
@@ -135,14 +125,12 @@ public class Mundo extends Object {
     }
 
     /**
-     * Checks if a specified line is full, i.e. only contains no empty
-     * squares. If the line is outside the board, true will always be 
-     * returned.
+     * Verifica se uma determinada linha está xeia, se a linha estiver fora do
+     * tabuleiro de jogo retorna true.
      *
-     * @param y         the vertical position (0 <= y < height)
+     * @param y         a posição vertical (0 <= y < height)
      * 
-     * @return true if the whole line is full, or
-     *         false otherwise
+     * @return true se toda a linha estiver cheia, falso em caso contrário.
      */
     public boolean isLineFull(int y) {
         if (y < 0 || y >= height) {
@@ -157,10 +145,9 @@ public class Mundo extends Object {
     }
 
     /**
-     * Checks if the board contains any full lines.
+     * Verifica se o tabuleiro contém alguma linha cheia.
      *
-     * @return true if there are full lines on the board, or
-     *         false otherwise
+     * @return true se estiver alguma linha cheia, falso em caso contrário
      */
     public boolean hasFullLines() {
         for (int y = height - 1; y >= 0; y--) {
