@@ -27,12 +27,12 @@ public class Mundo extends Object {
     /**
      * A largura do tabuleiro(em quadrados).
      */
-    private int  width = 0;
+    private int  largura = 0;
 
     /**
      * A altura do tabuleiro (em quadrados).
      */
-    private int  height = 0;
+    private int  altura = 0;
 
     /**
      * A matriz colorida do tabuleiro de jogo. Esta matriz contem uma entrada
@@ -45,19 +45,19 @@ public class Mundo extends Object {
      * Mensagam opcional do tabuleiro. Esta mensagem pode ser accionada a
      * qualquer altura, imprimindo o texto a meio do tabuleiro
      */
-    private String  message = null;
+    private String  mensagem = null;
 
     /**
      * Contador para o número de linhas que o jogador conseguiu completar, é
      * incrementado cada vez que o player completa uma linha.
      */
-    private int  removedLines = 0;
+    private int  LinhasRemovidas = 0;
 
     /**
      * Representação gráfica do tabuleiro de jogo. Esta componente gráfica
      * é criada quando a chamada getComponent() é realizada.
      */
-    private SquareBoardComponent  component = null;
+    private interfaceTabuleiroJogo  componente = null;
 
     /**
      * Cria um novo tabuleiro de jogo com o tamanho designado. O tabuleiro vai
@@ -66,25 +66,25 @@ public class Mundo extends Object {
      * @param width     a largura do tabuleiro
      * @param height    a altura do tabuleiro
      */
-    public Mundo(int width, int height) {
-        this.width = width;
-        this.height = height;
-        this.mundo = new Color[height][width];
-        clear();
+    public Mundo(int largura, int altura) {
+        this.largura = largura;
+        this.altura = altura;
+        this.mundo = new Color[altura][largura];
+        limpa();
     }
 
     /**
      * Verifica se o tabuleiro contém alguma linha cheia.
      * @return the number of full lines
      */
-    public int getFullLines() {
-		int fullLines = 0;
-        for (int y = height - 1; y >= 0; y--) {
-            if (isLineFull(y)) {
-				fullLines++;
+    public int getLinhasCompletas() {
+		int linhasCompletas = 0;
+        for (int y = altura - 1; y >= 0; y--) {
+            if (isLinhaCompleta(y)) {
+				linhasCompletas++;
             }
         }
-        return fullLines;
+        return linhasCompletas;
     }
     /**
      * Verifica se um quadrado específico não tem cor, ou seja se tiver fora 
@@ -96,33 +96,15 @@ public class Mundo extends Object {
      * 
      * @return true se o quadrado for vazio (emtpy), falso em caso contrário
      */
-    public boolean isSquareEmpty(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
-            return x >= 0 && x < width && y < 0;
+    public boolean isBlocoVazio(int x, int y) {
+        if (x < 0 || x >= largura || y < 0 || y >= altura) {
+            return x >= 0 && x < largura && y < 0;
         } else {
             return mundo[y][x] == null;
         }
     }
 
-    /**
-     * Verifica se uma determinada linha está vazia, se a linha estiver fora
-     * do tabuleiro vai ser retornado false.
-     * 
-     * @param y         a posição vertical (0 <= y < height)
-     * 
-     * @return true se toda a linha estiver vazia, e falso em caso contrário
-     */
-    public boolean isLineEmpty(int y) {
-        if (y < 0 || y >= height) {
-            return false;
-        }
-        for (int x = 0; x < width; x++) {
-            if (mundo[y][x] != null) {
-                return false;
-            }
-        }
-        return true;
-    }
+
 
     /**
      * Verifica se uma determinada linha está xeia, se a linha estiver fora do
@@ -132,11 +114,11 @@ public class Mundo extends Object {
      * 
      * @return true se toda a linha estiver cheia, falso em caso contrário.
      */
-    public boolean isLineFull(int y) {
-        if (y < 0 || y >= height) {
+    public boolean isLinhaCompleta(int y) {
+        if (y < 0 || y >= altura) {
             return true;
         }
-        for (int x = 0; x < width; x++) {
+        for (int x = 0; x < largura; x++) {
             if (mundo[y][x] == null) {
                 return false;
             }
@@ -144,19 +126,6 @@ public class Mundo extends Object {
         return true;
     }
 
-    /**
-     * Verifica se o tabuleiro contém alguma linha cheia.
-     *
-     * @return true se estiver alguma linha cheia, falso em caso contrário
-     */
-    public boolean hasFullLines() {
-        for (int y = height - 1; y >= 0; y--) {
-            if (isLineFull(y)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Returns a graphical component to draw the board. The component 
@@ -167,11 +136,11 @@ public class Mundo extends Object {
      * 
      * @return a graphical component that draws this board
      */
-    public Component getComponent() {
-        if (component == null) {
-            component = new SquareBoardComponent();
+    public Component getComponente() {
+        if (componente == null) {
+            componente = new interfaceTabuleiroJogo();
         }
-        return component;
+        return componente;
     }
 
     /**
@@ -180,8 +149,8 @@ public class Mundo extends Object {
      * 
      * @return the board height in squares
      */
-    public int getBoardHeight() {
-        return height;
+    public int getAlturaTabuleiro() {
+        return altura;
     }
 
     /**
@@ -190,8 +159,8 @@ public class Mundo extends Object {
      * 
      * @return the board width in squares
      */
-    public int getBoardWidth() {
-        return width;
+    public int getLarguraTabuleiro() {
+        return largura;
     }
 
     /**
@@ -199,8 +168,8 @@ public class Mundo extends Object {
      * 
      * @return the number of lines removed since the last clear call
      */
-    public int getRemovedLines() {
-        return removedLines;
+    public int getLinhasRemovidas() {
+        return LinhasRemovidas;
     }
 
     /**
@@ -212,8 +181,8 @@ public class Mundo extends Object {
      * 
      * @return the square color, or null for none
      */
-    public Color getSquareColor(int x, int y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
+    public Color getCorBloco(int x, int y) {
+        if (x < 0 || x >= largura || y < 0 || y >= altura) {
             return null;
         } else {
             return mundo[y][x];
@@ -230,13 +199,13 @@ public class Mundo extends Object {
      * @param y         the vertical position (0 <= y < height)
      * @param color     the new square color, or null for empty
      */
-    public void setSquareColor(int x, int y, Color color) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
+    public void setCorBloco(int x, int y, Color cor) {
+        if (x < 0 || x >= largura || y < 0 || y >= altura) {
             return;
         }
-        mundo[y][x] = color;
-        if (component != null) {
-            component.invalidateSquare(x, y);
+        mundo[y][x] = cor;
+        if (componente != null) {
+            componente.invalidaBloco(x, y);
         }
     }
 
@@ -248,10 +217,10 @@ public class Mundo extends Object {
      * @param message  a message to display, or null to remove a
      *                 previous message
      */
-    public void setMessage(String message) {
-        this.message = message;
-        if (component != null) {
-            component.redrawAll();
+    public void setMensagem(String mensagem) {
+        this.mensagem = mensagem;
+        if (componente != null) {
+            componente.reDesenhaTudo();
         }
     }
 
@@ -260,15 +229,15 @@ public class Mundo extends Object {
      * side-effects, the number of removed lines will be reset to 
      * zero, and the component will be repainted immediately.
      */
-    public void clear() {
-        removedLines = 0;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+    public void limpa() {
+        LinhasRemovidas = 0;
+        for (int y = 0; y < altura; y++) {
+            for (int x = 0; x < largura; x++) {
                 this.mundo[y][x] = null;
             }
         }
-        if (component != null) {
-            component.redrawAll();
+        if (componente != null) {
+            componente.reDesenhaTudo();
         }
     }
 
@@ -280,22 +249,22 @@ public class Mundo extends Object {
      * 
      * @see #hasFullLines
      */
-    public void removeFullLines() {
-        boolean repaint = false;
+    public void removeLinhasCompletas() {
+        boolean repinta = false;
 
         // Remove full lines
-        for (int y = height - 1; y >= 0; y--) {
-            if (isLineFull(y)) {
-                removeLine(y);
-                removedLines++;
-                repaint = true;
+        for (int y = altura - 1; y >= 0; y--) {
+            if (isLinhaCompleta(y)) {
+                removeLinha(y);
+                LinhasRemovidas++;
+                repinta = true;
                 y++;
             }
         }
 
         // Repaint if necessary
-        if (repaint && component != null) {
-            component.redrawAll();
+        if (repinta && componente != null) {
+            componente.reDesenhaTudo();
         }
     }
 
@@ -306,16 +275,16 @@ public class Mundo extends Object {
      *
      * @param y         the vertical position (0 <= y < height)
      */
-    private void removeLine(int y) {
-        if (y < 0 || y >= height) {
+    private void removeLinha(int y) {
+        if (y < 0 || y >= altura) {
             return;
         }
         for (; y > 0; y--) {
-            for (int x = 0; x < width; x++) {
+            for (int x = 0; x < largura; x++) {
                 mundo[y][x] = mundo[y - 1][x];
             }
         }
-        for (int x = 0; x < width; x++) {
+        for (int x = 0; x < largura; x++) {
             mundo[0][x] = null;
         }
     }
@@ -324,8 +293,8 @@ public class Mundo extends Object {
      * Updates the graphical component. Any squares previously changed 
      * will be repainted by this method.
      */
-    public void update() {
-        component.redraw();
+    public void actualizaMundo() {
+        componente.reDesenha();
     }
 
 
@@ -335,7 +304,7 @@ public class Mundo extends Object {
      * detailed information that must be sent between the square board
      * and its graphical representation.
      */
-    private class SquareBoardComponent extends Component {
+    private class interfaceTabuleiroJogo extends Component {
 
         /**
          * The component size. If the component has been resized, that 
@@ -357,7 +326,7 @@ public class Mundo extends Object {
          * component size is changed, i.e. when the <code>size</code> 
          * variable is modified.
          */
-        private Dimension  squareSize = new Dimension(0, 0);
+        private Dimension  tamanhoBloco = new Dimension(0, 0);
 
         /**
          * An image used for double buffering. The board is first
@@ -378,40 +347,40 @@ public class Mundo extends Object {
         /**
          * The board message color.
          */
-        private Color  messageColor = Color.white;
+        private Color  corMensagem = Color.white;
 
         /**
          * A lookup table containing lighter versions of the colors.
          * This table is used to avoid calculating the lighter 
          * versions of the colors for each and every square drawn.
          */
-        private Hashtable  lighterColors = new Hashtable();
+        private Hashtable  coresClaras = new Hashtable();
 
         /**
          * A lookup table containing darker versions of the colors.
          * This table is used to avoid calculating the darker
          * versions of the colors for each and every square drawn.
          */
-        private Hashtable  darkerColors = new Hashtable();
+        private Hashtable  coresEscuras = new Hashtable();
 
         /**
          * A flag set when the component has been updated.
          */
-        private boolean  updated = true;
+        private boolean  actualizado = true;
 
         /**
          * A bounding box of the squares to update. The coordinates 
          * used in the rectangle refers to the square matrix.
          */
-        private Rectangle  updateRect = new Rectangle();
+        private Rectangle  actualizaRect = new Rectangle();
 
         /**
          * Creates a new square board component.
          */
-        public SquareBoardComponent() {
+        public interfaceTabuleiroJogo() {
             setBackground(Configuration.getColor("board.background", 
                                                  "#000000"));
-            messageColor = Configuration.getColor("board.message", 
+            corMensagem = Configuration.getColor("board.message", 
                                                   "#ffffff");
         }
 
@@ -421,25 +390,25 @@ public class Mundo extends Object {
          * @param x     the horizontal position (0 <= x < width)
          * @param y     the vertical position (0 <= y < height)
          */
-        public void invalidateSquare(int x, int y) {
-            if (updated) {
-                updated = false;
-                updateRect.x = x;
-                updateRect.y = y;
-                updateRect.width = 0;
-                updateRect.height = 0;
+        public void invalidaBloco(int x, int y) {
+            if (actualizado) {
+                actualizado = false;
+                actualizaRect.x = x;
+                actualizaRect.y = y;
+                actualizaRect.width = 0;
+                actualizaRect.height = 0;
             } else {
-                if (x < updateRect.x) {
-                    updateRect.width += updateRect.x - x;
-                    updateRect.x = x;
-                } else if (x > updateRect.x + updateRect.width) {
-                    updateRect.width = x - updateRect.x;
+                if (x < actualizaRect.x) {
+                    actualizaRect.width += actualizaRect.x - x;
+                    actualizaRect.x = x;
+                } else if (x > actualizaRect.x + actualizaRect.width) {
+                    actualizaRect.width = x - actualizaRect.x;
                 }
-                if (y < updateRect.y) {
-                    updateRect.height += updateRect.y - y;
-                    updateRect.y = y;
-                } else if (y > updateRect.y + updateRect.height) {
-                    updateRect.height = y - updateRect.y;
+                if (y < actualizaRect.y) {
+                    actualizaRect.height += actualizaRect.y - y;
+                    actualizaRect.y = y;
+                } else if (y > actualizaRect.y + actualizaRect.height) {
+                    actualizaRect.height = y - actualizaRect.y;
                 }
             }
         }
@@ -450,16 +419,16 @@ public class Mundo extends Object {
          * been marked as in need of redrawing, no redrawing will 
          * occur.
          */
-        public void redraw() {
+        public void reDesenha() {
             Graphics  g;
 
-            if (!updated) {
-                updated = true;
+            if (!actualizado) {
+                actualizado = true;
                 g = getGraphics();
-                g.setClip(insets.left + updateRect.x * squareSize.width,
-                          insets.top + updateRect.y * squareSize.height,
-                          (updateRect.width + 1) * squareSize.width,
-                          (updateRect.height + 1) * squareSize.height);
+                g.setClip(insets.left + actualizaRect.x * tamanhoBloco.width,
+                          insets.top + actualizaRect.y * tamanhoBloco.height,
+                          (actualizaRect.width + 1) * tamanhoBloco.width,
+                          (actualizaRect.height + 1) * tamanhoBloco.height);
                 paint(g);
             }
         }
@@ -467,15 +436,15 @@ public class Mundo extends Object {
         /**
          * Redraws the whole component.
          */
-        public void redrawAll() {
+        public void reDesenhaTudo() {
             Graphics  g;
 
-            updated = true;
+            actualizado = true;
             g = getGraphics();
             g.setClip(insets.left, 
                       insets.top, 
-                      width * squareSize.width, 
-                      height * squareSize.height);
+                      largura * tamanhoBloco.width, 
+                      altura * tamanhoBloco.height);
             paint(g);
         }
 
@@ -494,7 +463,7 @@ public class Mundo extends Object {
          * @return the preferred component size
          */
         public Dimension getPreferredSize() {
-            return new Dimension(width * 20, height * 20);
+            return new Dimension(largura * 20, altura * 20);
         }
 
         /**
@@ -526,13 +495,13 @@ public class Mundo extends Object {
          * 
          * @return the lighter version of the color
          */
-        private Color getLighterColor(Color c) {
+        private Color getCorClara(Color c) {
             Color  lighter;
             
-            lighter = (Color) lighterColors.get(c);
+            lighter = (Color) coresClaras.get(c);
             if (lighter == null) {
                 lighter = c.brighter().brighter();
-                lighterColors.put(c, lighter);
+                coresClaras.put(c, lighter);
             }
             return lighter;
         }
@@ -548,13 +517,13 @@ public class Mundo extends Object {
          * 
          * @return the darker version of the color
          */
-        private Color getDarkerColor(Color c) {
+        private Color getCorEscura(Color c) {
             Color  darker;
             
-            darker = (Color) darkerColors.get(c);
+            darker = (Color) coresEscuras.get(c);
             if (darker == null) {
                 darker = c.darker().darker();
-                darkerColors.put(c, darker);
+                coresEscuras.put(c, darker);
             }
             return darker;
         }
@@ -573,19 +542,19 @@ public class Mundo extends Object {
             // Handle component size change
             if (size == null || !size.equals(getSize())) {
                 size = getSize();
-                squareSize.width = size.width / width;
-                squareSize.height = size.height / height;
-                if (squareSize.width <= squareSize.height) {
-                    squareSize.height = squareSize.width;
+                tamanhoBloco.width = size.width / largura;
+                tamanhoBloco.height = size.height / altura;
+                if (tamanhoBloco.width <= tamanhoBloco.height) {
+                    tamanhoBloco.height = tamanhoBloco.width;
                 } else {
-                    squareSize.width = squareSize.height;
+                    tamanhoBloco.width = tamanhoBloco.height;
                 }
-                insets.left = (size.width - width * squareSize.width) / 2;
+                insets.left = (size.width - largura * tamanhoBloco.width) / 2;
                 insets.right = insets.left;
                 insets.top = 0;
-                insets.bottom = size.height - height * squareSize.height;
-                bufferImage = createImage(width * squareSize.width, 
-                                          height * squareSize.height);
+                insets.bottom = size.height - altura * tamanhoBloco.height;
+                bufferImage = createImage(largura * tamanhoBloco.width, 
+                                          altura * tamanhoBloco.height);
             }
 
             // Paint component in buffer image
@@ -618,12 +587,12 @@ public class Mundo extends Object {
             g.setColor(getBackground());
             g.fillRect(0, 
                        0, 
-                       width * squareSize.width, 
-                       height * squareSize.height);
+                       largura * tamanhoBloco.width, 
+                       altura * tamanhoBloco.height);
             
             // Paint squares
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
+            for (int y = 0; y < altura; y++) {
+                for (int x = 0; x < largura; x++) {
                     if (mundo[y][x] != null) {
                         paintSquare(g, x, y);
                     }
@@ -631,8 +600,8 @@ public class Mundo extends Object {
             }
 
             // Paint message
-            if (message != null) {
-                paintMessage(g, message);
+            if (mensagem != null) {
+                paintMessage(g, mensagem);
             }
         }
 
@@ -646,35 +615,35 @@ public class Mundo extends Object {
          */
         private void paintSquare(Graphics g, int x, int y) {
             Color  color = mundo[y][x];
-            int    xMin = x * squareSize.width;
-            int    yMin = y * squareSize.height;
-            int    xMax = xMin + squareSize.width - 1;
-            int    yMax = yMin + squareSize.height - 1;
+            int    xMin = x * tamanhoBloco.width;
+            int    yMin = y * tamanhoBloco.height;
+            int    xMax = xMin + tamanhoBloco.width - 1;
+            int    yMax = yMin + tamanhoBloco.height - 1;
             int    i;
 
             // Skip drawing if not visible
             bufferRect.x = xMin;
             bufferRect.y = yMin;
-            bufferRect.width = squareSize.width;
-            bufferRect.height = squareSize.height;
+            bufferRect.width = tamanhoBloco.width;
+            bufferRect.height = tamanhoBloco.height;
             if (!bufferRect.intersects(g.getClipBounds())) {
                 return;
             }
 
             // Fill with base color
             g.setColor(color);
-            g.fillRect(xMin, yMin, squareSize.width, squareSize.height);
+            g.fillRect(xMin, yMin, tamanhoBloco.width, tamanhoBloco.height);
 
             // Draw brighter lines
-            g.setColor(getLighterColor(color));
-            for (i = 0; i < squareSize.width / 10; i++) {
+            g.setColor(getCorClara(color));
+            for (i = 0; i < tamanhoBloco.width / 10; i++) {
                 g.drawLine(xMin + i, yMin + i, xMax - i, yMin + i);
                 g.drawLine(xMin + i, yMin + i, xMin + i, yMax - i);
             }
 
             // Draw darker lines
-            g.setColor(getDarkerColor(color));
-            for (i = 0; i < squareSize.width / 10; i++) {
+            g.setColor(getCorEscura(color));
+            for (i = 0; i < tamanhoBloco.width / 10; i++) {
                 g.drawLine(xMax - i, yMin + i, xMax - i, yMax - i);
                 g.drawLine(xMin + i, yMax - i, xMax - i, yMax - i);
             }
@@ -694,15 +663,15 @@ public class Mundo extends Object {
             int  y;
 
             // Find string font width
-            g.setFont(new Font("SansSerif", Font.BOLD, squareSize.width + 4));
+            g.setFont(new Font("SansSerif", Font.BOLD, tamanhoBloco.width + 4));
             fontWidth = g.getFontMetrics().stringWidth(msg);
 
             // Find centered position
-            x = (width * squareSize.width - fontWidth) / 2;
-            y = height * squareSize.height / 2;
+            x = (largura * tamanhoBloco.width - fontWidth) / 2;
+            y = altura * tamanhoBloco.height / 2;
 
             // Draw black version of the string
-            offset = squareSize.width / 10;
+            offset = tamanhoBloco.width / 10;
             g.setColor(Color.black);
             g.drawString(msg, x - offset, y - offset);
             g.drawString(msg, x - offset, y);
@@ -714,7 +683,7 @@ public class Mundo extends Object {
             g.drawString(msg, x + offset, y + offset);
 
             // Draw white version of the string
-            g.setColor(messageColor);
+            g.setColor(corMensagem);
             g.drawString(msg, x, y);
         }
     }

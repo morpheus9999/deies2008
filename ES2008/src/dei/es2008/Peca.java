@@ -164,9 +164,9 @@ public class Peca {
         xPos = 0;
         yPos = 0;
 
-        newX = mundo.getBoardWidth() / 2;
+        newX = mundo.getLarguraTabuleiro() / 2;
         if (center) {
-            newY = mundo.getBoardHeight() / 2;
+            newY = mundo.getAlturaTabuleiro() / 2;
         } else {
             newY = 0;
             for (i = 0; i < coordenadasPecas.length; i++) {
@@ -185,7 +185,7 @@ public class Peca {
         xPos = newX;
         yPos = newY;
         paint(color);
-        mundo.update();
+        mundo.actualizaMundo();
 
         return true;
     }
@@ -241,7 +241,7 @@ public class Peca {
                 paint(null);
                 xPos--;
                 paint(color);
-                mundo.update();
+                mundo.actualizaMundo();
                 }                        
         }
         
@@ -250,7 +250,7 @@ public class Peca {
                 paint(null);
                 xPos++;
                 paint(color);
-                mundo.update();
+                mundo.actualizaMundo();
             }                        
         }
         
@@ -260,7 +260,7 @@ public class Peca {
                 paint(null);
                 yPos++;
                 paint(color);
-                mundo.update();
+                mundo.actualizaMundo();
             }            
         }        
     }
@@ -294,7 +294,7 @@ public class Peca {
             paint(null);
             numeroRotacao = novoNumeroRotacoes;
             paint(color);
-            mundo.update();
+            mundo.actualizaMundo();
         }
     }
 
@@ -361,7 +361,7 @@ public class Peca {
         for (int i = 0; i < 4; i++) {
             x = newX + getRelativeX(i, novoNumeroRotacoes);
             y = newY + getRelativeY(i, novoNumeroRotacoes);
-            if (!isInside(x, y) && !mundo.isSquareEmpty(x, y)) {
+            if (!isInside(x, y) && !mundo.isBlocoVazio(x, y)) {
                 return false;
             }
         }
@@ -425,7 +425,7 @@ public class Peca {
         for (int i = 0; i < coordenadasPecas.length; i++) {
             x = xPos + getRelativeX(i, numeroRotacao);
             y = yPos + getRelativeY(i, numeroRotacao);
-            mundo.setSquareColor(x, y, color);
+            mundo.setCorBloco(x, y, color);
         }
     }
 }
