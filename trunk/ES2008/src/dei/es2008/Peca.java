@@ -1,18 +1,41 @@
-/***********************************************************************
- * Module:  Peca.java
- * Author:  Filipe
- * Purpose: Defines the Class Peca
- ***********************************************************************/
+/*
+ * @(#)Figure.java
+ *
+ * This work is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
+ *
+ * This work is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * Copyright (c) 2003 Per Cederberg. All rights reserved.
+ */
+
 package dei.es2008;
 
 import java.awt.Color;
-import java.awt.Point;
-import java.util.*;
 
-/** @pdOid 2d5cdd22-f6e0-4a7e-a82d-b5e138dc265e */
-public class Peca {
+/**
+ * A class representing a Tetris square figure. Each figure consists 
+ * of four connected squares in one of seven possible constellations. 
+ * The figures may be rotated in 90 degree steps and have sideways and 
+ * downwards movability.<p>
+ * 
+ * Each figure instance can have two states, either attached to a 
+ * square board or not. When attached, all move and rotation 
+ * operations are checked so that collisions do not occur with other
+ * squares on the board. When not attached, any rotation can be made 
+ * (and will be kept when attached to a new board).
+ *
+ * @version  1.2
+ * @author   Per Cederberg, per@percederberg.net
+ */
+public class Peca extends Object {
 
-    
+
     public static final int QUADRADO = 1;
     public static final int LINHA = 2;
     public static final int S = 3;
@@ -20,40 +43,59 @@ public class Peca {
     public static final int L = 5;
     public static final int L_INVERTIDO = 6;
     public static final int T = 7;
-    
-    private int tipo;
-    private int numeroRotacao;
+   
     private Mundo board = null;
+
     private int xPos = 0;
     private int yPos = 0;
+
     private int orientation = 0;
     private int maxOrientation = 4;
+
     private int[] shapeX = new int[4];
     private int[] shapeY = new int[4];
-    /** @pdOid 6d38fb3a-ec66-47ac-8a66-1f0e6090dffd */
-    private Point[] coordenadasPecas;
-    /** @pdOid 81ae8e7e-f513-461e-ac9d-e88e9ede1c21 */
-    private Point[][] ajustesPecasTipo1;
-    private Point[][] ajustesPecasTipo2;
-    private Point[][] ajustesPecasTipo3;
-    private Point[][] ajustesPecasTipo4;
-    private Point[][] ajustesPecasTipo5;
-    private Point[][] ajustesPecasTipo6;
-    private Mundo mundo;
-    private Point p;
-    /**
-     * The figure color.
-     */
+
     private Color color = Color.white;
 
-    public Peca(Mundo mundo, int num) {
-        this.mundo = mundo;
-        this.tipo=num;
-        //falta criar o array coordenadasPecas
+    /**
+     * Creates a new figure of one of the seven predefined types. The
+     * figure will not be attached to any square board and default
+     * colors and orientations will be assigned.
+     *
+     * @param type      the figure type (one of the figure constants)
+     * 
+     * @see #QUADRADO
+     * @see #LINHA
+     * @see #S
+     * @see #S:INVERTIDO
+     * @see #L
+     * @see #L_INVERTIDO
+     * @see #T
+     * 
+     * @throws IllegalArgumentException if the figure type specified
+     *             is not recognized
+     */
+    public Peca(int tipo) throws IllegalArgumentException {
+        initialize(tipo);
     }
-
     
-       private void iniciaPeca(int tipo) throws IllegalArgumentException {
+    /**
+     * Initializes the instance variables for a specified figure type.
+     * 
+     * @param type      the figure type (one of the figure constants)
+     * 
+     * @see #QUADRADO
+     * @see #LINHA
+     * @see #S
+     * @see #S:INVERTIDO
+     * @see #L
+     * @see #L_INVERTIDO
+     * @see #T
+     * 
+     * @throws IllegalArgumentException if the figure type specified
+     *             is not recognized
+     */
+    private void initialize(int tipo) throws IllegalArgumentException {
         
         // Initialize default variables
         board = null;
@@ -148,23 +190,21 @@ public class Peca {
             shapeY[3] = 1;
             break;
         default :
-            throw new IllegalArgumentException("Nao existe a figura: " + 
+            throw new IllegalArgumentException("No figure constant: " + 
                                                tipo);
         }
     }
-    
-    
-    
-    
-    /** @metodo responsavel pelas rotações das peças
-        peça do tipo 1 corresponde ao 'L'
-     *  peça do tipo 2 corresponde ao 'L invertido'
-     *  peça do tipo 3 corresponde ao 'T'
-     *  peça do tipo 4 corresponde ao 'S'
-     *  peça do tipo 5 corresponde ao 'S invertido'
-     *  peça do tipo 6 corresponde a 'barra'
-     *  peça do tipo 7 corresponde ao 'quadrado'
+
+    /**
+     * Checks if this figure is attached to a square board.
+     * 
+     * @return true if the figure is already attached, or
+     *         false otherwise
      */
+    public boolean isAttached() {
+        return board != null;
+    }
+
     /**
      * Attaches the figure to a specified square board. The figure 
      * will be drawn either at the absolute top of the board, with 
@@ -182,16 +222,10 @@ public class Peca {
      * @param board     the square board to attach to
      * @param center    the centered position flag
      * 
-     * @return true if the figure could be attached, or false otherwise
+     * @return true if the figure could be attached, or
+     *         false otherwise
      */
-    public boolean isAttached() {
-        return mundo != null;
-    }
-    public void detach() {
-        mundo = null;
-    }
-
-    public boolean attach(Mundo mundo, boolean center) {
+    public boolean attach(Mundo board, boolean center) {
         int  newX;
         int  newY;
         int  i;
@@ -202,146 +236,174 @@ public class Peca {
         }
 
         // Reset position (for correct controls)
-        p.x = 0;
-        p.y = 0;
+        xPos = 0;
+        yPos = 0;
 
         // Calculate position
-        newX = mundo.getBoardWidth() / 2;
+        newX = board.getBoardWidth() / 2;
         if (center) {
-            newY = mundo.getBoardHeight() / 2;
+            newY = board.getBoardHeight() / 2;
         } else {
             newY = 0;
-            for (i = 0; i < coordenadasPecas.length; i++) {
-                if(tipo==1){
-                    if (getRelativeY(i, numeroRotacao) - newY > 0) {
-                    newY = -getRelativeY(i, numeroRotacao);
+            for (i = 0; i < shapeX.length; i++) {
+                if (getRelativeY(i, orientation) - newY > 0) {
+                    newY = -getRelativeY(i, orientation);
                 }
-                }
-                
             }
         }
 
         // Check position        
-        this.mundo = mundo;
-        if (!canMoveTo(newX, newY, numeroRotacao)) {
-            this.mundo = null;
+        this.board = board;
+        if (!canMoveTo(newX, newY, orientation)) {
+            this.board = null;
             return false;
         }
 
         // Draw figure
-        p.x = newX;
-        p.y = newY;
+        xPos = newX;
+        yPos = newY;
         paint(color);
-        mundo.update();
+        board.update();
 
         return true;
     }
+    
     /**
-     * Checks if the figure can move to a new position. The current 
-     * figure position is taken into account when checking for 
-     * collisions. If a collision is detected, this method will return false.
-     *
-     * @param newX            the new horizontal position
-     * @param newY            the new vertical position
-     * @param newOrientation  the new orientation (rotation)
-     * 
-     * @return true if the figure can be moved, or false otherwise
+     * Detaches this figure from its square board. The figure will not
+     * be removed from the board by this operation, resulting in the
+     * figure being left intact.
      */
-    private boolean canMoveTo(int newX, int newY, int newOrientation) {
-        int  x;
-        int  y;
+    public void detach() {
+        board = null;
+    }
 
-        for (int i = 0; i < 4; i++) {
-            x = newX + getRelativeX(i, newOrientation);
-            y = newY + getRelativeY(i, newOrientation);
-            if (!isInside(x, y) && !mundo.isSquareEmpty(x, y)) {
+    /**
+     * Checks if the figure is fully visible on the square board. If
+     * the figure isn't attached to a board, false will be returned.
+     * 
+     * @return true if the figure is fully visible, or 
+     *         false otherwise
+     */
+    public boolean isAllVisible() {
+        if (!isAttached()) {
+            return false;
+        }
+        for (int i = 0; i < shapeX.length; i++) {
+            if (yPos + getRelativeY(i, orientation) < 0) {
                 return false;
             }
         }
         return true;
     }
-    
-    /**
-     * Checks if a specified pair of (square) coordinates are inside the figure, or not.
-     *
-     * @param x         the horizontal position
-     * @param y         the vertical position
-     * 
-     * @return true if the coordinates are inside the figure, or false otherwise
-     */
-    private boolean isInside(int x, int y) {
-        for (int i = 0; i < coordenadasPecas.length; i++) {
-            if (x == p.x + getRelativeX(i, numeroRotacao)
-             && y == p.y + getRelativeY(i, numeroRotacao)) {
 
-                return true;
-            }
-        }
-        return false;
-    }
     /**
-     * Rotates the relative vertical position of a specified square. 
-     * The square will be rotated according to the specified orientation.
+     * Checks if the figure has landed. If this method returns true,
+     * the moveDown() or the moveAllWayDown() methods should have no 
+     * effect. If no square board is attached, this method will return
+     * true.
      *
-     * @param square       the square to rotate (0-3)
-     * @param orientation  the orientation to use (0-3)
-     * 
-     * @return the rotated relative vertical position
+     * @return true if the figure has landed, or false otherwise
      */
-    private int getRelativeY(int square, int orientation) {
-        switch (orientation % 4) {
-        case 0 :
-            return coordenadasPecas[square].y;
-        case 1 :
-            return coordenadasPecas[square].x;
-        case 2 :
-            return -coordenadasPecas[square].y;
-        case 3 :
-            return -coordenadasPecas[square].x;
-        default:
-            return 0; // Should never occur
-        }
+    public boolean hasLanded() {
+        return !isAttached() || !canMoveTo(xPos, yPos + 1, orientation);
     }
-    
-    /**
-     * Returns the relative horizontal position of a specified square.
-     * The square will be rotated according to the specified orientation.
-     *
-     * @param square       the square to rotate (0-3)
-     * @param orientation  the orientation to use (0-3)
-     * 
-     * @return the rotated relative horizontal position
-     */
-    private int getRelativeX(int square, int orientation) {
-        switch (orientation % 4) {
-        case 0 :
-            return coordenadasPecas[square].x;
-        case 1 :
-            return -coordenadasPecas[square].y;
-        case 2 :
-            return -coordenadasPecas[square].x;
-        case 3 :
-            return coordenadasPecas[square].y;
-        default:
-            return 0; // Should never occur
-        }
-    }
-    /**
-     * Paints the figure on the board with the specified color.
-     *
-     * @param color     the color to paint with, or null for clearing
-     */
-    private void paint(Color color) {
-        int x, y;
 
-        for (int i = 0; i < coordenadasPecas.length; i++) {
-            x = p.x + getRelativeX(i, numeroRotacao);
-            y = p.y + getRelativeY(i, numeroRotacao);
-            mundo.setSquareColor(x, y, color);
+    /**
+     * Moves the figure one step to the left. If such a move is not
+     * possible with respect to the square board, nothing is done. The 
+     * square board will be changed as the figure moves, clearing the 
+     * previous cells. If no square board is attached, nothing is 
+     * done.
+     */
+    public void moveLeft() {
+        if (isAttached() && canMoveTo(xPos - 1, yPos, orientation)) {
+            paint(null);
+            xPos--;
+            paint(color);
+            board.update();
         }
     }
+
+    /**
+     * Moves the figure one step to the right. If such a move is not
+     * possible with respect to the square board, nothing is done. The 
+     * square board will be changed as the figure moves, clearing the 
+     * previous cells. If no square board is attached, nothing is 
+     * done.
+     */
+    public void moveRight() {
+        if (isAttached() && canMoveTo(xPos + 1, yPos, orientation)) {
+            paint(null);
+            xPos++;
+            paint(color);
+            board.update();
+        }
+    }
+
+    /**
+     * Moves the figure one step down. If such a move is not possible 
+     * with respect to the square board, nothing is done. The square 
+     * board will be changed as the figure moves, clearing the 
+     * previous cells. If no square board is attached, nothing is 
+     * done.
+     */
+    public void moveDown() {
+        if (isAttached() && canMoveTo(xPos, yPos + 1, orientation)) {
+            paint(null);
+            yPos++;
+            paint(color);
+            board.update();
+        }
+    }
+
+    /**
+     * Moves the figure all the way down. The limits of the move are 
+     * either the square board bottom, or squares not being empty. If 
+     * no move is possible with respect to the square board, nothing 
+     * is done. The square board will be changed as the figure moves, 
+     * clearing the previous cells. If no square board is attached, 
+     * nothing is done.
+     */
+    public void moveAllWayDown() {
+        int y = yPos;
+
+        // Check for board
+        if (!isAttached()) {
+            return;
+        }
+
+        // Find lowest position
+        while (canMoveTo(xPos, y + 1, orientation)) {
+            y++;
+        }
+
+        // Update
+        if (y != yPos) {
+            paint(null);
+            yPos = y;
+            paint(color);
+            board.update();
+        }
+    }
+
+    /**
+     * Returns the current figure rotation (orientation).
+     * 
+     * @return the current figure rotation
+     */
+    public int getRotation() {
+        return orientation;
+    }
     
-    
+    /**
+     * Sets the figure rotation (orientation). If the desired rotation 
+     * is not possible with respect to the square board, nothing is 
+     * done. The square board will be changed as the figure moves,
+     * clearing the previous cells. If no square board is attached, 
+     * the rotation is performed directly.
+     * 
+     * @param rotation  the new figure orientation
+     */
     public void setRotation(int rotation) {
         int newOrientation;
 
@@ -350,17 +412,15 @@ public class Peca {
 
         // Check new position
         if (!isAttached()) {
-             numeroRotacao = newOrientation;
-        } else if (canMoveTo(p.x, p.y, newOrientation)) {
+            orientation = newOrientation;
+        } else if (canMoveTo(xPos, yPos, newOrientation)) {
             paint(null);
-            numeroRotacao = newOrientation;
+            orientation = newOrientation;
             paint(color);
-            mundo.update();
+            board.update();
         }
     }
-     public int getRotation() {
-        return numeroRotacao;
-    }
+
     /**
      * Rotates the figure randomly. If such a rotation is not
      * possible with respect to the square board, nothing is done.
@@ -371,278 +431,147 @@ public class Peca {
     public void rotateRandom() {
         setRotation((int) (Math.random() * 4.0) % maxOrientation);
     }
-//    public void rodarPeca() {
-//
-//        if (tipo == 1) {
-//            switch (numeroRotacao) {
-//                case 0:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo1[0][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo1[0][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 1:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo1[1][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo1[1][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 2:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo1[2][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo1[2][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 3:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo1[3][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo1[3][i].y;
-//                        }
-//                        numeroRotacao = 0;
-//                    }
-//            }
-//
-//        }
-//
-//        if (tipo == 2) {
-//            switch (numeroRotacao) {
-//                case 0:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo2[0][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo2[0][i].y;
-//                        }
-//
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 1:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo2[1][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo2[1][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 2:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo2[2][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo2[2][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 3:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo2[3][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo2[3][i].y;
-//                        }
-//                        numeroRotacao = 0;
-//                    }
-//            }
-//
-//
-//        }
-//        if (tipo == 3) {
-//            switch (numeroRotacao) {
-//                case 0:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo3[0][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo3[0][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 1:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo3[1][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo3[1][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 2:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo3[2][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo3[2][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 3:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo3[3][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo3[3][i].y;
-//                        }
-//                        numeroRotacao = 0;
-//                    }
-//            }
-//
-//
-//        }
-//        if (tipo == 4) {
-//            switch (numeroRotacao) {
-//                case 0:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo4[0][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo4[0][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 1:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo4[1][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo4[1][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 2:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo4[2][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo4[2][i].y;
-//                        }
-//                        numeroRotacao = 0;
-//                    }
-//                    break;
-//
-//            }
-//
-//        }
-//        if (tipo == 5) {
-//            switch (numeroRotacao) {
-//                case 0:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo5[0][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo5[0][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 1:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo5[1][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo5[1][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 2:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo5[2][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo5[2][i].y;
-//                        }
-//                        numeroRotacao = 0;
-//                    }
-//                    break;
-//
-//            }
-//
-//        }
-//        if (tipo == 6) {
-//            switch (numeroRotacao) {
-//                case 0:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo6[0][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo6[0][i].y;
-//                        }
-//                        numeroRotacao += 1;
-//                    }
-//                    break;
-//
-//                case 1:
-//                    if (mundo.verificaPosicaoPeca()) {
-//                        for (int i = 0; i < coordenadasPecas.length; i++) {
-//                            coordenadasPecas[i].x = coordenadasPecas[i].x + ajustesPecasTipo6[1][i].x;
-//                            coordenadasPecas[i].y = coordenadasPecas[i].y + ajustesPecasTipo6[1][i].y;
-//                        }
-//                        numeroRotacao = 0;
-//                    }
-//                    break;
-//            }
-//
-//        }
-//
-//    }
 
-    /** @param direccao
-     * metodo responsável pelo deslocamento das peças para a direita, esquerda e para baixo
-       direccao = -1 corresponde a um deslocamento para a esquerda
-     * direccao = 1 corresponde a um deslocamento para a direita
-     * direccao = 0 corresponde a um deslocamento para baixo
-     */
     /**
-     * Checks if the figure has landed. If this method returns true,
-     * the moveDown() or the moveAllWayDown() methods should have no 
-     * effect. If no square board is attached, this method will return true.
-     *
-     * @return true if the figure has landed, or false otherwise
+     * Rotates the figure clockwise. If such a rotation is not
+     * possible with respect to the square board, nothing is done.
+     * The square board will be changed as the figure moves,
+     * clearing the previous cells. If no square board is attached, 
+     * the rotation is performed directly.
      */
-    public boolean hasLanded() {
-        return !isAttached() || !canMoveTo(p.x, p.y + 1, numeroRotacao);
+    public void rotateClockwise() {
+        if (maxOrientation == 1) {
+            return;
+        } else {
+            setRotation((orientation + 1) % maxOrientation);
+        }
+    }
+
+    /**
+     * Rotates the figure counter-clockwise. If such a rotation
+     * is not possible with respect to the square board, nothing
+     * is done. The square board will be changed as the figure
+     * moves, clearing the previous cells. If no square board is 
+     * attached, the rotation is performed directly.
+     */
+    public void rotateCounterClockwise() {
+        if (maxOrientation == 1) {
+            return;
+        } else {
+            setRotation((orientation + 3) % 4);
+        }
+    }
+
+    /**
+     * Checks if a specified pair of (square) coordinates are inside 
+     * the figure, or not.
+     *
+     * @param x         the horizontal position
+     * @param y         the vertical position
+     * 
+     * @return true if the coordinates are inside the figure, or
+     *         false otherwise
+     */
+    private boolean isInside(int x, int y) {
+        for (int i = 0; i < shapeX.length; i++) {
+            if (x == xPos + getRelativeX(i, orientation)
+             && y == yPos + getRelativeY(i, orientation)) {
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the figure can move to a new position. The current 
+     * figure position is taken into account when checking for 
+     * collisions. If a collision is detected, this method will return
+     * false.
+     *
+     * @param newX            the new horizontal position
+     * @param newY            the new vertical position
+     * @param newOrientation  the new orientation (rotation)
+     * 
+     * @return true if the figure can be moved, or
+     *         false otherwise
+     */
+    private boolean canMoveTo(int newX, int newY, int newOrientation) {
+        int  x;
+        int  y;
+
+        for (int i = 0; i < 4; i++) {
+            x = newX + getRelativeX(i, newOrientation);
+            y = newY + getRelativeY(i, newOrientation);
+            if (!isInside(x, y) && !board.isSquareEmpty(x, y)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns the relative horizontal position of a specified square.
+     * The square will be rotated according to the specified 
+     * orientation.
+     *
+     * @param square       the square to rotate (0-3)
+     * @param orientation  the orientation to use (0-3)
+     * 
+     * @return the rotated relative horizontal position
+     */
+    private int getRelativeX(int square, int orientation) {
+        switch (orientation % 4) {
+        case 0 :
+            return shapeX[square];
+        case 1 :
+            return -shapeY[square];
+        case 2 :
+            return -shapeX[square];
+        case 3 :
+            return shapeY[square];
+        default:
+            return 0; // Should never occur
+        }
+    }
+
+    /**
+     * Rotates the relative vertical position of a specified square. 
+     * The square will be rotated according to the specified 
+     * orientation.
+     *
+     * @param square       the square to rotate (0-3)
+     * @param orientation  the orientation to use (0-3)
+     * 
+     * @return the rotated relative vertical position
+     */
+    private int getRelativeY(int square, int orientation) {
+        switch (orientation % 4) {
+        case 0 :
+            return shapeY[square];
+        case 1 :
+            return shapeX[square];
+        case 2 :
+            return -shapeY[square];
+        case 3 :
+            return -shapeX[square];
+        default:
+            return 0; // Should never occur
+        }
     }
     
-//    public void deslocarPeca(int direccao) {
-//        if (direccao == -1) {
-//            if(mundo.verificaPosicaoPeca()){
-//                for (int i = 0; i < coordenadasPecas.length; i++) {
-//                    coordenadasPecas[i].x -= 1;
-//                }
-//            }            
-//        }
-//        
-//        if (direccao == 1) {
-//            if(mundo.verificaPosicaoPeca()){
-//                for (int i = 0; i < coordenadasPecas.length; i++) {
-//                    coordenadasPecas[i].x += 1;
-//                }
-//            }            
-//        }        
-//        
-//        if (direccao == 0) {
-//            if(mundo.verificaPosicaoPeca()){
-//                for (int i = 0; i < coordenadasPecas.length; i++) {
-//                    coordenadasPecas[i].y += 1;
-//                }
-//            }            
-//        }        
-//    }
+    /**
+     * Paints the figure on the board with the specified color.
+     *
+     * @param color     the color to paint with, or null for clearing
+     */
+    private void paint(Color color) {
+        int x, y;
+
+        for (int i = 0; i < shapeX.length; i++) {
+            x = xPos + getRelativeX(i, orientation);
+            y = yPos + getRelativeY(i, orientation);
+            board.setSquareColor(x, y, color);
+        }
+    }
 }
