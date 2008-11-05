@@ -3,7 +3,7 @@
  * Author:  Filipe
  * Purpose: Defines the Class Mundo
  ***********************************************************************/
-//MERDAAAAAAAAAAAAAA
+
 package dei.es2008;
 
 import java.awt.Color;
@@ -30,6 +30,7 @@ public class Mundo {
        @pdRoleInfo migr=yes name=Peca assc=association13 */
    //private Peca peca=new Peca(this);
    public int score;
+
    
    /** @pdOid 062af6de-82ba-4a79-b5c3-52f9cf8d65cd */
    private int height;
