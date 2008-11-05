@@ -20,7 +20,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.prefs.Preferences;
 import javax.swing.JButton;
@@ -86,11 +89,11 @@ public class Gui {
 
 		if (isApplet) {
 			try {
-//				InputStream is = appContext.getStream("highScores");
-//				BufferedReader br = new BufferedReader(new InputStreamReader(is));
-//				highScore.setSerializedScores(br.readLine());
-//				br.close();
-//				is.close();
+				InputStream is = appContext.getStream("highScores");
+				BufferedReader br = new BufferedReader(new InputStreamReader(is));
+				highScore.setSerializedScores(br.readLine());
+				br.close();
+				is.close();
 			} catch (Exception ex) {
 				System.err.println("can't load high score: " + ex.getMessage());
 			}
@@ -362,7 +365,7 @@ public class Gui {
         mundo.setMessage("Game Over");
         component.button.setLabel("Start");
 
-		//handleHighScoreModification();
+		handleHighScoreModification();
 
 		if (! isApplet) try {
 			prefRoot.putBoolean("showPreview", showPreview);
@@ -384,22 +387,22 @@ public class Gui {
     /**
      * Handle a high score modification event. This will modify the high score list if necessary.
      */
-//    private void handleHighScoreModification() {
-//		if (highScore.putScore(score)) {
-//			String hs = highScore.getSerializedScores();
-//			try {
-//				if (isApplet) {
-//					InputStream bais = new ByteArrayInputStream(hs.getBytes());
-//					appContext.setStream("highScores", bais);
-//				} else {
-//					prefRoot.put("highScores", hs);
-//					prefRoot.flush();
-//				}
-//			} catch (Exception ex) {
-//				System.err.println("can't store high score: "+ex.getMessage());
-//			}
-//		}
-//    }
+    private void handleHighScoreModification() {
+		if (highScore.putScore(mundo.score)) {
+			String hs = highScore.getSerializedScores();
+			try {
+				if (isApplet) {
+					InputStream bais = new ByteArrayInputStream(hs.getBytes());
+					appContext.setStream("highScores", bais);
+				} else {
+					prefRoot.put("highScores", hs);
+					prefRoot.flush();
+				}
+			} catch (Exception ex) {
+				System.err.println("can't store high score: "+ex.getMessage());
+			}
+		}
+    }
     /**
      * Handles a game pause event. This will pause the game thread and
      * print a pause message on the game board.
