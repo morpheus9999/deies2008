@@ -128,13 +128,12 @@ public class Mundo extends Object {
 
 
     /**
-     * Returns a graphical component to draw the board. The component 
-     * returned will automatically be updated when changes are made to
-     * this board. Multiple calls to this method will return the same
-     * component, as a square board can only have a single graphical
-     * representation.
+     * Devolve uma componente grárica para desenhar o tabuleiro. Esta componente
+     * irá ser automaticamente actualizada quando são feitas mudanças ao
+     * tabuleiro. Multiplas chamadas a este método vao devolver a mesma 
+     * componente, visto que só existe um mundo.
      * 
-     * @return a graphical component that draws this board
+     * @return Devolve uma componente gráfica que desenha este tabuleiro
      */
     public Component getComponente() {
         if (componente == null) {
@@ -147,39 +146,42 @@ public class Mundo extends Object {
      * Returns the board height (in squares). This method returns, 
      * i.e, the number of vertical squares that fit on the board.
      * 
-     * @return the board height in squares
+     * Devolve a altura do tabuleiro (em quadrados). Este método devolve o
+     * número de quadrados verticais que cabem no tabuleiro.
+     * 
+     * @return a altura do tabuleiro em quadrados
      */
     public int getAlturaTabuleiro() {
         return altura;
     }
 
     /**
-     * Returns the board width (in squares). This method returns, i.e,
-     * the number of horizontal squares that fit on the board.
+     * Devolve a largura do tabuleiro (em quadrados). Este método devolve o
+     * número de quadrados na horizontal que cabem no tabuleiro.
      * 
-     * @return the board width in squares
+     * @return a largura do tabuleiro em quadrados.
      */
     public int getLarguraTabuleiro() {
         return largura;
     }
 
     /**
-     * Returns the number of lines removed since the last clear().
+     * Devolve o número de linhas removidas desde o último clear().
      * 
-     * @return the number of lines removed since the last clear call
+     * @return o número de linhas removidas desde a última chamada do clear()
      */
     public int getLinhasRemovidas() {
         return LinhasRemovidas;
     }
 
     /**
-     * Returns the color of an individual square on the board. If the 
-     * square is empty or outside the board, null will be returned.
+     * Devolve a cor de um quadrado específico do tabuleiro. Se o quadrado
+     * estiver vazio ou fora do tabuleiro retorna null.
      *
-     * @param x         the horizontal position (0 <= x < width)
-     * @param y         the vertical position (0 <= y < height)
+     * @param x         a posição horizontal (0 <= x < width)
+     * @param y         a posição vertical (0 <= y < height)
      * 
-     * @return the square color, or null for none
+     * @return a cor do quadrado, ou null se não a tiver.
      */
     public Color getCorBloco(int x, int y) {
         if (x < 0 || x >= largura || y < 0 || y >= altura) {
@@ -189,15 +191,14 @@ public class Mundo extends Object {
         }
     }
 
-    /**
-     * Changes the color of an individual square on the board. The 
-     * square will be marked as in need of a repaint, but the 
-     * graphical component will NOT be repainted until the update() 
-     * method is called.
+    /**      
+     * Muda a cor de um quadrado específico do tabuleiro. O quadrado vai ser
+     * marcado para ser repintado, mas a componente gráfica não o vai repintar
+     * até o método update() ser chamado.
      *
-     * @param x         the horizontal position (0 <= x < width)
-     * @param y         the vertical position (0 <= y < height)
-     * @param color     the new square color, or null for empty
+     * @param x         a posição horizontal (0 <= x < width)
+     * @param y         a posição vertical (0 <= y < height)
+     * @param color     a nova posição do quadrado, null se estiver vazio
      */
     public void setCorBloco(int x, int y, Color cor) {
         if (x < 0 || x >= largura || y < 0 || y >= altura) {
@@ -210,12 +211,12 @@ public class Mundo extends Object {
     }
 
     /**
-     * Sets a message to display on the square board. This is supposed 
-     * to be used when the board is not being used for active drawing, 
-     * as it slows down the drawing considerably.
-     *
-     * @param message  a message to display, or null to remove a
-     *                 previous message
+     * Define uma mensagem a ser mostrada no tabuleiro.`É suposto ser usado
+     * apenas quando o tabuleiro não estiver a ser utilizado para desenhos, 
+     * uma vez que atrasa o processo de desenho consideravelmente.
+     * 
+     * @param message  uma mensagem a ser imprimida, null se se pretender 
+     * remover
      */
     public void setMensagem(String mensagem) {
         this.mensagem = mensagem;
@@ -225,9 +226,9 @@ public class Mundo extends Object {
     }
 
     /**
-     * Clears the board, i.e. removes all the colored squares. As 
-     * side-effects, the number of removed lines will be reset to 
-     * zero, and the component will be repainted immediately.
+     * Limpa o tabuleiro, ou seja, remove todos os quadrados coloridos.
+     * Também faz reset ao número de linhas completas, e a componente vai ser
+     * repintada imediatamente.
      */
     public void limpa() {
         LinhasRemovidas = 0;
@@ -242,17 +243,16 @@ public class Mundo extends Object {
     }
 
     /**
-     * Removes all full lines. All lines above a removed line will be 
-     * moved downward one step, and a new empty line will be added at 
-     * the top. After removing all full lines, the component will be 
-     * repainted.
+     * Remove todas as linhas cheias. Todas as linhas acima vão ser movidas 
+     * para baixo um quadrado, e uma nova linha vazia vai ser adicionada no
+     * topo. Após remover todas as linhas cheias a componente vai ser repintada
      * 
-     * @see #hasFullLines
+     * @ver #hasFullLines
      */
     public void removeLinhasCompletas() {
         boolean repinta = false;
 
-        // Remove full lines
+        // Remove as linhas cheias
         for (int y = altura - 1; y >= 0; y--) {
             if (isLinhaCompleta(y)) {
                 removeLinha(y);
@@ -262,18 +262,18 @@ public class Mundo extends Object {
             }
         }
 
-        // Repaint if necessary
+        // Repinta se necessário
         if (repinta && componente != null) {
             componente.reDesenhaTudo();
         }
     }
 
     /**
-     * Removes a single line. All lines above are moved down one step, 
-     * and a new empty line is added at the top. No repainting will be 
-     * done after removing the line.
-     *
-     * @param y         the vertical position (0 <= y < height)
+     * Remove uma única linha, todas as linhas acima são movidas um passo abaixo
+     * e uma nova linha vazia é adicionada ao topo. Não vai haver repinturas
+     * após remover a linha.
+     * 
+     * @param y         a posição vertical (0 <= y < height)
      */
     private void removeLinha(int y) {
         if (y < 0 || y >= altura) {
@@ -290,8 +290,8 @@ public class Mundo extends Object {
     }
 
     /**
-     * Updates the graphical component. Any squares previously changed 
-     * will be repainted by this method.
+     * Actualiza a componente gráfica. Qualquer quadrado previamente mudado
+     * irá ser repintado por este método.
      */
     public void actualizaMundo() {
         componente.reDesenha();
@@ -299,41 +299,42 @@ public class Mundo extends Object {
 
 
     /**
-     * The graphical component that paints the square board. This is
-     * implemented as an inner class in order to better abstract the 
-     * detailed information that must be sent between the square board
-     * and its graphical representation.
+     * A componente gráfica que pinta o tabuleiro. Isto é implementado
+     * como uma classe interior de maneira a facilitar a abstracção da
+     * informação detalhada que tem que ser enviada entre o tabuleiro e a
+     * sua representação gráfica.
      */
     private class interfaceTabuleiroJogo extends Component {
 
         /**
-         * The component size. If the component has been resized, that 
-         * will be detected when the paint method executes. If this 
-         * value is set to null, the component dimensions are unknown.
+         * A componente tamanho. Se esta componente for redimencionada, isso
+         * irá ser detectado quando o método de pintura for executado.
+         * Se este valor for designado como null as dimensões serão
+         * desconhecidas.
          */
         private Dimension  size = null;
 
         /**
-         * The component insets. The inset values are used to create a 
-         * border around the board to compensate for a skewed aspect 
-         * ratio. If the component has been resized, the insets values 
-         * will be recalculated when the paint method executes.
+         * A componente insets. Os valores de inset são usados para
+         * criar uma fronteira á volta do tabuleiro de maneira a compensar
+         * o aspecto desproporcional . Se o componente for redimencionado, 
+         * os valores inset vao ser recalculados quando o método de pintura
+         * for executado.
          */
         private Insets  insets = new Insets(0, 0, 0, 0);
 
         /**
-         * The square size in pixels. This value is updated when the 
-         * component size is changed, i.e. when the <code>size</code> 
-         * variable is modified.
+         * O tamanho dos quadrados em pixels. Este valor é actualizado quando
+         * o componente tamanho e alterado.
          */
         private Dimension  tamanhoBloco = new Dimension(0, 0);
 
         /**
-         * An image used for double buffering. The board is first
-         * painted onto this image, and that image is then painted 
-         * onto the real surface in order to avoid making the drawing
-         * process visible to the user. This image is recreated each
-         * time the component size changes.
+         * Uma imagem usada para buffering duplo. O tabuleiro e primeiro
+         * pintado para esta imagem, depois essa imagem é enttão pintada na
+         * superfície "real" de maneira a evitar mostrar este processo vísivel
+         * ao utilzador. Esta imagem será então recreada cada vez que a 
+         * componente tamanho (size) muda.
          */
         private Image  bufferImage = null;
 
@@ -345,37 +346,37 @@ public class Mundo extends Object {
         private Rectangle  bufferRect = new Rectangle();
 
         /**
-         * The board message color.
+         * A cor da mensagem
          */
         private Color  corMensagem = Color.white;
 
         /**
-         * A lookup table containing lighter versions of the colors.
-         * This table is used to avoid calculating the lighter 
-         * versions of the colors for each and every square drawn.
+         * Uma tabela de pesquisa que contém vesões mais claras das cores.
+         * Esta tabela é usada para evitar calcular as versões mais claras
+         * das cores para cada quadrado desenhado.
          */
         private Hashtable  coresClaras = new Hashtable();
 
         /**
-         * A lookup table containing darker versions of the colors.
-         * This table is used to avoid calculating the darker
-         * versions of the colors for each and every square drawn.
+         * Uma tabela de pesquisa que contém vesões mais escuras das cores.
+         * Esta tabela é usada para evitar calcular as versões mais escuras
+         * das cores para cada quadrado desenhado.
          */
         private Hashtable  coresEscuras = new Hashtable();
 
         /**
-         * A flag set when the component has been updated.
+         * Uma flag definida para quando o componente for actualizado.
          */
         private boolean  actualizado = true;
 
         /**
-         * A bounding box of the squares to update. The coordinates 
-         * used in the rectangle refers to the square matrix.
+         * Uma caixa delimitadora dos quadrados para actualizar. As coordenadas
+         * usadas no rectangulo referem-se ao quadrado matriz.
          */
         private Rectangle  actualizaRect = new Rectangle();
 
         /**
-         * Creates a new square board component.
+         * Cria uma nova componente tabuleiro
          */
         public interfaceTabuleiroJogo() {
             setBackground(Configuration.getColor("board.background", 
@@ -385,10 +386,11 @@ public class Mundo extends Object {
         }
 
         /**
-         * Adds a square to the set of squares in need of redrawing.
+         * Adiciona um quadrado ao conjunto de quadrados designados para
+         * redesenho.
          *
-         * @param x     the horizontal position (0 <= x < width)
-         * @param y     the vertical position (0 <= y < height)
+         * @param x     a posição horizontal (0 <= x < width)
+         * @param y     a posição vertical (0 <= y < height)
          */
         public void invalidaBloco(int x, int y) {
             if (actualizado) {
@@ -414,10 +416,9 @@ public class Mundo extends Object {
         }
 
 
-        /**
-         * Redraws all the invalidated squares. If no squares have 
-         * been marked as in need of redrawing, no redrawing will 
-         * occur.
+        /**  
+         * Redesenha todos os quadrados inúteis. Se nenhum quadrado estiver
+         * marcado como em espera para redesenho então nenhum será feito.
          */
         public void reDesenha() {
             Graphics  g;
@@ -434,7 +435,7 @@ public class Mundo extends Object {
         }
 
         /**
-         * Redraws the whole component.
+         * Redesenha toda a componente.
          */
         public void reDesenhaTudo() {
             Graphics  g;
@@ -449,51 +450,50 @@ public class Mundo extends Object {
         }
 
         /**
-         * Returns true as this component is double buffered.
+         * Retorna true uma vez que o componente é buffered duplamente.
          * 
-         * @return true as this component is double buffered
+         * @return true uma vez que o componente é buffered duplamente
          */
         public boolean isDoubleBuffered() {
             return true;
         }
         
         /**
-         * Returns the preferred size of this component.
+         * Retorna o tamanho preferido deste componente.
          * 
-         * @return the preferred component size
+         * @return o tamanho preferido deste componente
          */
         public Dimension getPreferredSize() {
             return new Dimension(largura * 20, altura * 20);
         }
 
         /**
-         * Returns the minimum size of this component.
+         * Retorna o tamanho mínimo deste componente.
          * 
-         * @return the minimum component size
+         * @return o tamanho mínimo deste componente
          */
         public Dimension getMinimumSize() {
             return getPreferredSize();
         }
 
         /**
-         * Returns the maximum size of this component.
+         * Retorna o tamanho máximo deste componente.
          * 
-         * @return the maximum component size
+         * @return o tamanho máximo deste componente
          */
         public Dimension getMaximumSize() {
             return getPreferredSize();
         }
 
         /**
-         * Returns a lighter version of the specified color. The 
-         * lighter color will looked up in a hashtable, making this
-         * method fast. If the color is not found, the ligher color 
-         * will be calculated and added to the lookup table for later
-         * reference.
+         * Retorna uma versão mais clara da cor especificada. A cor mais clara
+         * ira ser procurada na hashtable, tornando este método rápido. Se a cor
+         * não for encontrada, então a cor mais clara irá ser calculada e
+         * adicionada à tabela de pesquisa para referência futura.
          * 
-         * @param c     the base color
+         * @param c     a cor base
          * 
-         * @return the lighter version of the color
+         * @return a versão mais clara da cor
          */
         private Color getCorClara(Color c) {
             Color  lighter;
@@ -507,15 +507,14 @@ public class Mundo extends Object {
         }
 
         /**
-         * Returns a darker version of the specified color. The 
-         * darker color will looked up in a hashtable, making this
-         * method fast. If the color is not found, the darker color 
-         * will be calculated and added to the lookup table for later
-         * reference.
+         * Retorna uma versão mais escura da cor especificada. A cor mais clara
+         * ira ser procurada na hashtable, tornando este método rápido. Se a cor
+         * não for encontrada, então a cor mais escura irá ser calculada e
+         * adicionada à tabela de pesquisa para referência futura.
          * 
-         * @param c     the base color
+         * @param c     a cor base
          * 
-         * @return the darker version of the color
+         * @return a versão mais escura da cor
          */
         private Color getCorEscura(Color c) {
             Color  darker;
@@ -529,17 +528,17 @@ public class Mundo extends Object {
         }
 
         /**
-         * Paints this component indirectly. The painting is first 
-         * done to a buffer image, that is then painted directly to 
-         * the specified graphics context.
+         * Pinta esta componente indirectamente. A pintura é primeiro feita
+         * a uma imagem buffer, é então pintada directamente para o contexto
+         * gráfico especificado.
          * 
-         * @param g     the graphics context to use
+         * @param g     o contexto gráfico a usar
          */
         public synchronized void paint(Graphics g) {
             Graphics   bufferGraphics;
             Rectangle  rect;
 
-            // Handle component size change
+            // Gere a mudança da componente size
             if (size == null || !size.equals(getSize())) {
                 size = getSize();
                 tamanhoBloco.width = size.width / largura;
@@ -557,7 +556,7 @@ public class Mundo extends Object {
                                           altura * tamanhoBloco.height);
             }
 
-            // Paint component in buffer image
+            // Pinta a componente na imagem buffer
             rect = g.getClipBounds();
             bufferGraphics = bufferImage.getGraphics();
             bufferGraphics.setClip(rect.x - insets.left, 
@@ -566,7 +565,7 @@ public class Mundo extends Object {
                                    rect.height);
             paintComponent(bufferGraphics);
 
-            // Paint image buffer
+            // Pinta a imagem buffer
             g.drawImage(bufferImage, 
                         insets.left,
                         insets.top, 
@@ -575,22 +574,21 @@ public class Mundo extends Object {
         }
 
         /**
-         * Paints this component directly. All the squares on the 
-         * board will be painted directly to the specified graphics
-         * context.
+         * Pinta esta componente directamente. Todos os quadrados no tabuleiro
+         * vão ser pintados directamente para o contexto gráfico designado.
          * 
-         * @param g     the graphics context to use
+         * @param g     o contexto gráfico a usar
          */
         private void paintComponent(Graphics g) {
 
-            // Paint background
+            // Pinta o fundo
             g.setColor(getBackground());
             g.fillRect(0, 
                        0, 
                        largura * tamanhoBloco.width, 
                        altura * tamanhoBloco.height);
             
-            // Paint squares
+            // Pinta quadrados
             for (int y = 0; y < altura; y++) {
                 for (int x = 0; x < largura; x++) {
                     if (mundo[y][x] != null) {
@@ -599,19 +597,19 @@ public class Mundo extends Object {
                 }
             }
 
-            // Paint message
+            // Pinta mensagem
             if (mensagem != null) {
                 paintMessage(g, mensagem);
             }
         }
 
         /**
-         * Paints a single board square. The specified position must 
-         * contain a color object.
+         * Pinta um único quadrado do tabuleiro. A posição especificada
+         * tem que conter um objecto de cor.
          *
-         * @param g     the graphics context to use
-         * @param x     the horizontal position (0 <= x < width)
-         * @param y     the vertical position (0 <= y < height)
+         * @param g     o contexto gráfico a usar
+         * @param x     a posição horizontal (0 <= x < width)
+         * @param y     a posição vertical (0 <= y < height)
          */
         private void paintSquare(Graphics g, int x, int y) {
             Color  color = mundo[y][x];
@@ -621,7 +619,7 @@ public class Mundo extends Object {
             int    yMax = yMin + tamanhoBloco.height - 1;
             int    i;
 
-            // Skip drawing if not visible
+            // Evita desenhar se não for visivel
             bufferRect.x = xMin;
             bufferRect.y = yMin;
             bufferRect.width = tamanhoBloco.width;
@@ -630,18 +628,18 @@ public class Mundo extends Object {
                 return;
             }
 
-            // Fill with base color
+            // Enche com a cor base
             g.setColor(color);
             g.fillRect(xMin, yMin, tamanhoBloco.width, tamanhoBloco.height);
 
-            // Draw brighter lines
+            // Desenha linhas mais claras
             g.setColor(getCorClara(color));
             for (i = 0; i < tamanhoBloco.width / 10; i++) {
                 g.drawLine(xMin + i, yMin + i, xMax - i, yMin + i);
                 g.drawLine(xMin + i, yMin + i, xMin + i, yMax - i);
             }
 
-            // Draw darker lines
+            // Desenha linhas mais escuras
             g.setColor(getCorEscura(color));
             for (i = 0; i < tamanhoBloco.width / 10; i++) {
                 g.drawLine(xMax - i, yMin + i, xMax - i, yMax - i);
@@ -650,11 +648,10 @@ public class Mundo extends Object {
         }
 
         /**
-         * Paints a board message. The message will be drawn at the
-         * center of the component.
+         * Pinta a mensagem no tabuleiro. Vai aparecer no centro
          *
-         * @param g     the graphics context to use
-         * @param msg   the string message
+         * @param g     o contexto gráfico a usar
+         * @param msg   a mensagem em string
          */
         private void paintMessage(Graphics g, String msg) {
             int  fontWidth;
@@ -662,15 +659,15 @@ public class Mundo extends Object {
             int  x;
             int  y;
 
-            // Find string font width
+            // Encontra a largura da fonte da string
             g.setFont(new Font("SansSerif", Font.BOLD, tamanhoBloco.width + 4));
             fontWidth = g.getFontMetrics().stringWidth(msg);
 
-            // Find centered position
+            // Encontra a posição centrada
             x = (largura * tamanhoBloco.width - fontWidth) / 2;
             y = altura * tamanhoBloco.height / 2;
 
-            // Draw black version of the string
+            // Desenha uma versão preta da string
             offset = tamanhoBloco.width / 10;
             g.setColor(Color.black);
             g.drawString(msg, x - offset, y - offset);
@@ -682,7 +679,7 @@ public class Mundo extends Object {
             g.drawString(msg, x + offset, y);
             g.drawString(msg, x + offset, y + offset);
 
-            // Draw white version of the string
+            // Desenha uma versão branca da string
             g.setColor(corMensagem);
             g.drawString(msg, x, y);
         }
