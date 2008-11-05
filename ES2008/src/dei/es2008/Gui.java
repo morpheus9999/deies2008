@@ -104,12 +104,12 @@ public class Gui {
    }
    /** @pdOid fd504a66-e0c1-43d1-9111-0b1ed1c688cb */
    public void actualizaMundo() {
-      // TODO: implement
+      controladorDeJogo.actualizaMundo();
    }
    
    /** @pdOid c85ed12d-5f24-4a11-ba8a-dac8f3df35ed */
    public int actualizaEstadoPeca() {
-      // TODO: implement
+      controladorDeJogo.actualizaEstadoPeca(peca);
       return 0;
    }
    
@@ -122,32 +122,32 @@ public class Gui {
    
    /** @pdOid b4bd1c29-0751-4022-9fcd-27928c023a63 */
    public void sairJogo() {
-      // TODO: implement
+      controladorDeJogo.sairJogo();
    }
    
    /** @pdOid 3e250627-0c1f-49b1-abbb-141af507973a */
    public void verRanking() {
-      // TODO: implement
+      controladorDeJogo.verRanking();
    }
    
    /** @pdOid dcd1dd19-3b77-45a2-85de-169cbb5dc105 */
    public void gravarJogo() {
-      // TODO: implement
+      controladorDeJogo.gravarJogo();
    }
    
    /** @pdOid 5a55ec66-7e7d-490c-b8a5-e226177277af */
    public void carregarJogo() {
-      // TODO: implement
+      controladorDeJogo.carregarJogo();
    }
    
    /** @pdOid 58082346-d6b2-4ec1-8f20-6b5f7c85d0cd */
    public void inserirCodigo() {
-      // TODO: implement
+      controladorDeJogo.inserirCodigo(peca);
    }
    
    /** @pdOid bfcc7152-43d6-4caa-ba85-234bd21665c0 */
    public void pausarJogo() {
-      // TODO: implement
+      controladorDeJogo.pausarjogo();
    }
    /**
      * Handles a level modification event. This will modify the level
