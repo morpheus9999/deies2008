@@ -1,10 +1,7 @@
 package dei.es2008;
 
-import java.applet.AppletContext;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.util.prefs.Preferences;
 import javax.swing.*;
 
 
@@ -15,7 +12,7 @@ import javax.swing.*;
 class Gui extends JPanel {
         private ControladorDeJogo controlo;
         private Dimension  size = null;
-        public JLabel scoreLabel = new JLabel("Pontuação: 0");
+        public JLabel scoreLabel = new JLabel("Pontos: 0");
         private JLabel highScoreLabel = new JLabel("");
         private JList highScoreList;
         public JLabel levelLabel = new JLabel("Nível: 1");
@@ -36,7 +33,7 @@ class Gui extends JPanel {
 
             if (size == null || !size.equals(getSize())) {
                 size = getSize();
-                resizeComponents();
+                redimensionaComponentes();
             }
             g.setColor(getBackground());
             g.fillRect(rect.x, rect.y, rect.width, rect.height);
@@ -124,12 +121,12 @@ class Gui extends JPanel {
             enableEvents(KeyEvent.KEY_EVENT_MASK);
             this.addKeyListener(new KeyAdapter() {
                 public void keyPressed(KeyEvent e) {
-                    controlo.handleKeyEvent(e);
+                    controlo.trataTeclaPremida(e);
                 }
             });
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    controlo.handleButtonPressed();
+                    controlo.trataBotao();
                     controlo.componente.requestFocus();
                 }
             });
@@ -138,7 +135,7 @@ class Gui extends JPanel {
         /**
          * Redefine as componentes estaticas e invalida o layout actual.
          */
-        private void resizeComponents() {
+        private void redimensionaComponentes() {
             Dimension  size = scoreLabel.getSize();
             Font       font;
             int        unitSize;
