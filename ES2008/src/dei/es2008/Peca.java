@@ -12,7 +12,7 @@ public class Peca {
     public static final int L_INVERTIDO = 6;
     public static final int T = 7;
 
-    private Mundo mundo = null;
+    private Mundo mundo;
     private Point[] coordenadasPecas ;
     
     private int xPos = 0;
@@ -119,13 +119,13 @@ public class Peca {
     /**
      * @devolve true se a peca ja esta agarrada ao mundo
      */
-    public boolean isAttached() {
+    public boolean estaFundida() {
         return mundo != null;
     }
     /**
      * @devolve o numero de linhas que a peca fez cair     
      */
-    public int numRowsFallen() {
+    public int numLinhasOff() {
         return fallen;
     }
 
@@ -133,13 +133,13 @@ public class Peca {
      * metodo responsavel por juntar as pecas ao mundo.
      * @devolve true se a peca pode ser juntada ao mundo, caso contrario devolve false.
      */
-    public boolean attach(Mundo mundo, boolean center) {
+    public boolean fundePeca(Mundo mundo, boolean center) {
         int  newX;
         int  newY;
         int  i;
 
         // verifica se ja houve uma juncao de uma peca ao mundo.
-        if (isAttached()) {
+        if (estaFundida()) {
             detach();
         }
 
@@ -166,7 +166,7 @@ public class Peca {
 
         xPos = newX;
         yPos = newY;
-        paint(color);
+        desenhaPeca(color);
         mundo.actualizaMundo();
 
         return true;
@@ -182,8 +182,8 @@ public class Peca {
      * 
      * @devolve true se a peca esta totalmente visivel, caos contrario devolve false.
      */
-    public boolean isAllVisible() {
-        if (!isAttached()) {
+    public boolean estaVisivel() {
+        if (!estaFundida()) {
             return false;
         }
          for (int i = 0; i < coordenadasPecas.length; i++) {
@@ -201,8 +201,8 @@ public class Peca {
      * @devolve true se a peca chegou ao fundo do tabuleiro ou se assentou em pecas ja existentes, caso
      *  contrario devolve false.
      */
-    public boolean hasLanded() {
-        return !isAttached() || !verificaPosicaoPeca(xPos, yPos + 1, numeroRotacao);
+    public boolean aterrou() {
+        return !estaFundida() || !verificaPosicaoPeca(xPos, yPos + 1, numeroRotacao);
     }
 
         /**
@@ -215,29 +215,29 @@ public class Peca {
     public void deslocarPeca(int direccao){
         
         if(direccao == -1){
-            if (isAttached() && verificaPosicaoPeca(xPos - 1, yPos, numeroRotacao)) {
-                paint(null);
+            if (estaFundida() && verificaPosicaoPeca(xPos - 1, yPos, numeroRotacao)) {
+                desenhaPeca(null);
                 xPos--;
-                paint(color);
+                desenhaPeca(color);
                 mundo.actualizaMundo();
                 }                        
         }
         
         if(direccao == 1){
-            if (isAttached() && verificaPosicaoPeca(xPos + 1, yPos, numeroRotacao)) {
-                paint(null);
+            if (estaFundida() && verificaPosicaoPeca(xPos + 1, yPos, numeroRotacao)) {
+                desenhaPeca(null);
                 xPos++;
-                paint(color);
+                desenhaPeca(color);
                 mundo.actualizaMundo();
             }                        
         }
         
         if(direccao == 0){
             fallen = 0;
-            if (isAttached() && verificaPosicaoPeca(xPos, yPos + 1, numeroRotacao)) {
-                paint(null);
+            if (estaFundida() && verificaPosicaoPeca(xPos, yPos + 1, numeroRotacao)) {
+                desenhaPeca(null);
                 yPos++;
-                paint(color);
+                desenhaPeca(color);
                 mundo.actualizaMundo();
             }            
         }        
@@ -262,12 +262,12 @@ public class Peca {
         novoNumeroRotacoes = rotacao % maxNumeroRotacoes;
 
         // verifica a posicao da peca
-        if (!isAttached()) {
+        if (!estaFundida()) {
             numeroRotacao = novoNumeroRotacoes;
         } else if (verificaPosicaoPeca(xPos, yPos, novoNumeroRotacoes)) {
-            paint(null);
+            desenhaPeca(null);
             numeroRotacao = novoNumeroRotacoes;
-            paint(color);
+            desenhaPeca(color);
             mundo.actualizaMundo();
         }
     }
@@ -295,7 +295,7 @@ public class Peca {
      * Verifica se as coordenadas de um bloco se encontram numa peca.
      * @devolve true as coordenadas se encontram na peca, caso contrario devolve false.
      */
-    private boolean isInside(int x, int y) {
+    private boolean estaDentro(int x, int y) {
         for (int i = 0; i < coordenadasPecas.length; i++) {
             if (x == xPos + getRelativeX(i, numeroRotacao)
              && y == yPos + getRelativeY(i, numeroRotacao)) {
@@ -317,7 +317,7 @@ public class Peca {
         for (int i = 0; i < 4; i++) {
             x = newX + getRelativeX(i, novoNumeroRotacoes);
             y = newY + getRelativeY(i, novoNumeroRotacoes);
-            if (!isInside(x, y) && !mundo.isBlocoVazio(x, y)) {
+            if (!estaDentro(x, y) && !mundo.isBlocoVazio(x, y)) {
                 return false;
             }
         }
@@ -367,7 +367,7 @@ public class Peca {
     /**
      * Pinta a peca no mundo com uma cor especifica.             
      */
-    private void paint(Color color) {
+    private void desenhaPeca(Color color) {
         int x, y;
 
         for (int i = 0; i < coordenadasPecas.length; i++) {

@@ -128,7 +128,7 @@ public class Mundo extends Object {
 
 
     /**
-     * Devolve uma componente grárica para desenhar o tabuleiro. Esta componente
+     * Devolve uma componente gráfica para desenhar o tabuleiro. Esta componente
      * irá ser automaticamente actualizada quando são feitas mudanças ao
      * tabuleiro. Multiplas chamadas a este método vao devolver a mesma 
      * componente, visto que só existe um mundo.
@@ -143,9 +143,7 @@ public class Mundo extends Object {
     }
 
     /**
-     * Returns the board height (in squares). This method returns, 
-     * i.e, the number of vertical squares that fit on the board.
-     * 
+     *
      * Devolve a altura do tabuleiro (em quadrados). Este método devolve o
      * número de quadrados verticais que cabem no tabuleiro.
      * 

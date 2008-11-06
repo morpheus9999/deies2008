@@ -13,9 +13,9 @@ public class ControladorDeJogo {
 
 
     
-    public Mundo board = null;
+    public Mundo board;
     public Mundo previewBoard = new Mundo(5, 5);
-    public Gui componente =null;
+    public Gui componente;
     private Peca[] figures = {
         new Peca(Peca.QUADRADO),
         new Peca(Peca.LINHA),
@@ -25,22 +25,20 @@ public class ControladorDeJogo {
         new Peca(Peca.L_INVERTIDO),
         new Peca(Peca.T)
     };
-    private Mundo association10;
     private Ficheiros ficheiro;
     private Ranking ranking;
-    private Jogo kj;
-    public Mundo mundo;
+    //public Mundo mundo;
     public Jogo jogo;
     public Ficheiros ficheiros;
-    private Preferences prefRoot = null;
-    private AppletContext appContext = null;
+    private Preferences prefRoot;
+    private AppletContext appContext;
     
-    private GameThread thread = null;
+    private GameThread thread;
     private int nivel = 1;
     private int pontuacao = 0;
     
-    private Peca peca = null;
-    private Peca pecaSeguinte = null;
+    private Peca peca;
+    private Peca pecaSeguinte;
     private int rotacaoSeguinte = 0;
     private boolean mostraPrevisaoPeca = true;
     private boolean bloqueiaMovimento = false;
@@ -99,9 +97,9 @@ public class ControladorDeJogo {
     }
 
     /**
-     * Inicializa as variaveis do jogo antes de iniar um jogo
+     * Inicializa as variaveis do jogo antes de iniciar um jogo
      */
-    public void handleStart() {
+    public void trataArranque() {
 
         nivel = 1;
         pontuacao = 0;
@@ -113,8 +111,8 @@ public class ControladorDeJogo {
         board.setMensagem(null);
         board.limpa();
         previewBoard.limpa();
-        handleLevelModification();
-        handleScoreModification();
+        trataMudarNivel();
+        trataScore();
         componente.button.setLabel("Pausa");
 
         thread.reset();
@@ -123,7 +121,7 @@ public class ControladorDeJogo {
     /**
      * Para a thread do jogo, faz reset as pecas e escreve uma mensagem de fim de jogo.
      */
-    public void handleGameOver() {
+    public void trataFimJogo() {
 
         thread.setPaused(true);
         
@@ -139,7 +137,7 @@ public class ControladorDeJogo {
         board.setMensagem("Game Over");
         componente.button.setLabel("Iniciar");
 
-		handleHighScoreModification();
+		trataRankingMod();
 
 		if (! isApplet) try {
 			prefRoot.putBoolean("ver peça seguinte", mostraPrevisaoPeca);
@@ -150,7 +148,7 @@ public class ControladorDeJogo {
     /**
      * Faz pausa no jogo e escreve uma mensagem de pausa no ecra.
      */
-    public void handlePause() {
+    public void trataPausa() {
         thread.setPaused(true);
         
         board.setMensagem("Pausado");
@@ -160,7 +158,7 @@ public class ControladorDeJogo {
     /**
      * retoma o jogo depois de uma pausa. repoe a thread e remove a mensagem de pausa do ecra.
      */
-    public void handleResume() {
+    public void trataRetomarJogo() {
         board.setMensagem(null);
         componente.button.setLabel("Pausar");
         thread.setPaused(false);
@@ -169,7 +167,7 @@ public class ControladorDeJogo {
     /**
      * Modifica o nivel e ajusta a velocidade da thread.
      */
-    public void handleLevelModification() {
+    public void trataMudarNivel() {
         componente.levelLabel.setText("Nível: " + nivel);
         thread.adjustSpeed();
     }
@@ -177,14 +175,14 @@ public class ControladorDeJogo {
     /**
      * modifica a label da pontuacao.
      */
-    public void handleScoreModification() {
-        componente.scoreLabel.setText("Pontuação: " + pontuacao);
+    public void trataScore() {
+        componente.scoreLabel.setText("Pontos: " + pontuacao);
     }
  
     /**
      * Modifica o ranking se necessari
      */
-    public void handleHighScoreModification() {
+    public void trataRankingMod() {
 		if (ranking.inserePontuacao(pontuacao)) {
 			String hs = ranking.getSerializedPontuacoes();
 			try {
@@ -205,7 +203,7 @@ public class ControladorDeJogo {
      * Metodo que move a "peca seguinte" para a posicao da "peca actual" e 
      * cria uma nova "peca seguinte".
      */
-    public void handleFigureStart() {
+    public void adicionaPeca() {
         int  rotation;
 
         peca = pecaSeguinte;
@@ -217,16 +215,16 @@ public class ControladorDeJogo {
 
         if (mostraPrevisaoPeca) {
             previewBoard.limpa(); 
-            pecaSeguinte.attach(previewBoard, true);
+            pecaSeguinte.fundePeca(previewBoard, true);
             pecaSeguinte.detach();
         }
 
         peca.setRotacao(rotation);
-        if (!peca.attach(board, false)) {
+        if (!peca.fundePeca(board, false)) {
             previewBoard.limpa();
-            peca.attach(previewBoard, true);
+            peca.fundePeca(previewBoard, true);
             peca.detach();
-            handleGameOver();
+            trataFimJogo();
         }
     }
 
@@ -235,15 +233,15 @@ public class ControladorDeJogo {
      * de "game over".
      */
 
-    public void handleFigureLanded() {
+    public void trataFigAterrou() {
 
 
-        if (peca.isAllVisible()) {
-			if (peca.numRowsFallen() > 0)
+        if (peca.estaVisivel()) {
+			if (peca.numLinhasOff() > 0)
 				pontuacao += nivel * 10;
-            pontuacao += nivel * peca.numRowsFallen();
+            pontuacao += nivel * peca.numLinhasOff();
         } else {
-            handleGameOver();
+            trataFimJogo();
             return;
         }
         peca.detach();
@@ -269,43 +267,43 @@ public class ControladorDeJogo {
 			}
             if (nivel < 9 && board.getLinhasRemovidas() / 20 > nivel) {
                 nivel = board.getLinhasRemovidas() / 20;
-                handleLevelModification();
+                trataMudarNivel();
             }
         } else {
-            handleFigureStart();
+            adicionaPeca();
         }
 
-		handleScoreModification();
+		trataScore();
     }
 
     /**
      * Metodo que faz descer a peca no tabuleiro ao longo do tempo.
      * Verifica a cada instante se a peca assentou no tabuleiro.
      */
-    public synchronized void handleTimer() {
+    public synchronized void temporizador() {
         if (peca == null) {
-            handleFigureStart();
-        } else if (peca.hasLanded()) {
-            handleFigureLanded();
+            adicionaPeca();
+        } else if (peca.aterrou()) {
+            trataFigAterrou();
         } else {
             peca.deslocarPeca(0);
         }
     }
 
-    public synchronized void handleButtonPressed() {
+    public synchronized void trataBotao() {
         if (pecaSeguinte == null) {
-            handleStart();
+            trataArranque();
         } else if (thread.isPaused()) {
-            handleResume();
+            trataRetomarJogo();
         } else {
-            handlePause();
+            trataPausa();
         }
     }
 
-    public synchronized void handleKeyEvent(KeyEvent e) {
+    public synchronized void trataTeclaPremida(KeyEvent e) {
 
         if (e.getKeyCode() == KeyEvent.VK_P) {
-            handleButtonPressed();
+            trataBotao();
             return;
         }
 
@@ -338,14 +336,14 @@ public class ControladorDeJogo {
         case KeyEvent.VK_S:
             if (nivel < 9) {
                 nivel++;
-                handleLevelModification();
+                trataMudarNivel();
             }
             break;
 
         case KeyEvent.VK_N:
             mostraPrevisaoPeca = !mostraPrevisaoPeca;
             if (mostraPrevisaoPeca && peca != pecaSeguinte) {
-                pecaSeguinte.attach(previewBoard, true);
+                pecaSeguinte.fundePeca(previewBoard, true);
                 pecaSeguinte.detach(); 
             } else {
                 previewBoard.limpa();
@@ -398,7 +396,7 @@ public class ControladorDeJogo {
 
         public void run() {
             while (thread == this) {
-                handleTimer();
+                temporizador();
 
                 try {
                     Thread.sleep(sleepTime);
@@ -451,17 +449,8 @@ public class ControladorDeJogo {
         }
     }
 
-    public void actualizaEstadoPeca(int estado) {        
-        
-    }
 
     public void actualizaMundo() {
         jogo.carregarInstante();
-    }
-
-    public void pausarjogo() {
-        /*thread.setPaused(true);
-        board.setMessage("Paused");
-        component.button.setLabel("Resume");*/
     }
 }
