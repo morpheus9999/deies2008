@@ -65,7 +65,7 @@ public class ControladorDeJogo {
 			}
 		} else {
 			prefRoot = Preferences.userNodeForPackage(Gui.class);
-			String hs = prefRoot.get("", null);
+			String hs = prefRoot.get("Ranking", null);
 			if (hs != null)
 				ranking.setSerializedPontuacoes(hs);
 			mostraPrevisaoPeca = prefRoot.getBoolean("ver peça seguinte", true);
@@ -183,14 +183,15 @@ public class ControladorDeJogo {
      * Modifica o ranking se necessari
      */
     public void trataRankingMod() {
-		if (ranking.inserePontuacao(pontuacao)) {
+        String nome="MANEL";
+		if (ranking.inserePontuacao(pontuacao, nome)) {
 			String hs = ranking.getSerializedPontuacoes();
 			try {
 				if (isApplet) {
 					InputStream bais = new ByteArrayInputStream(hs.getBytes());
-					appContext.setStream("", bais);
+					appContext.setStream("Ranking", bais);
 				} else {
-					prefRoot.put("", hs);
+					prefRoot.put("Ranking", hs);
 					prefRoot.flush();
 				}
 			} catch (Exception ex) {
@@ -451,6 +452,6 @@ public class ControladorDeJogo {
 
 
     public void actualizaMundo() {
-        jogo.carregarInstante();
+        //jogo.carregarInstante();
     }
 }
