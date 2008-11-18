@@ -24,9 +24,9 @@ public class Ranking implements ListModel {
 		pontuacoes = new ArrayList();
 	}
 
-	public boolean inserePontuacao (int pontuacao) {
+	public boolean inserePontuacao (int pontuacao, String Nome) {
 		if (pontuacoes.size() == 0) {
-			pontuacoes.add(new Pontuacao(pontuacao, new Date()));
+			pontuacoes.add(new Pontuacao(pontuacao, new Date(), Nome));
 			notifyListeners();
 			return true;
 		}
@@ -34,7 +34,7 @@ public class Ranking implements ListModel {
 		for (int i=0; i<pontuacoes.size(); i++) {
 			Pontuacao sc = (Pontuacao) pontuacoes.get(i);
 			if (pontuacao > sc.getPontuacao()) {
-				pontuacoes.add(i, new Pontuacao(pontuacao, new Date()));
+				pontuacoes.add(i, new Pontuacao(pontuacao, new Date(), Nome));
 				if (pontuacoes.size() > numPontucoes)
 					pontuacoes.remove(pontuacoes.size()-1);
 				
@@ -63,6 +63,7 @@ public class Ranking implements ListModel {
 			sb.append(",").append(dt.getYear());
 			sb.append(",").append(dt.getMonth());
 			sb.append(",").append(dt.getDate());
+                        sb.append(",").append(sc.getNome());
 		}
 		return sb.toString();
 	}
@@ -71,11 +72,12 @@ public class Ranking implements ListModel {
 		String[] parts = serializedPontuacoes.split(",");
 		pontuacoes.clear();
 		numPontucoes = Integer.parseInt(parts[0]);
-		for (int i=1; i<parts.length; i+=4) {
+		for (int i=1; i<parts.length; i+=5) {
 			pontuacoes.add(new Pontuacao(Integer.parseInt(parts[i]),
 						new Date(Integer.parseInt(parts[i+1]),
 								Integer.parseInt(parts[i+2]),
-								Integer.parseInt(parts[i+3]))));
+								Integer.parseInt(parts[i+3])),
+                                                                parts[i+4]));
 		}
 	}
 
@@ -84,6 +86,7 @@ public class Ranking implements ListModel {
 			Pontuacao sc = (Pontuacao) pontuacoes.get(index);
 			Date dt = sc.getData();
 			String str = ""+sc.getPontuacao();
+                        str=str+" "+sc.getNome();
 			while (str.length() < 5)
 				str = " "+str;
 
@@ -95,6 +98,7 @@ public class Ranking implements ListModel {
 					+ (year<10 ? "0" : "") + year + "/"
 					+ (month<10 ? "0" : "") + month + "/"
 					+ (day<10 ? "0" : "") + day;
+                        
 		} else {
 			return "";
 		}
@@ -115,15 +119,19 @@ public class Ranking implements ListModel {
 	private class Pontuacao {
 		int pontuacao;
 		Date data;
+                String Nome;
 
-		public Pontuacao (int pontuacao, Date data) {
+		public Pontuacao (int pontuacao, Date data, String Nome) {
 			this.pontuacao = pontuacao;
 			this.data = data;
+                        this.Nome = Nome;
 		}
 
 		public int getPontuacao() { return pontuacao; }
 
 		public Date getData() { return data; }
+                
+                public String getNome() { return Nome; }
 	}
 }
 
