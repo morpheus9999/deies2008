@@ -9,14 +9,17 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Vector;
 import java.util.prefs.Preferences;
 
 public class ControladorDeJogo {
 
     public Mundo board;
-    
-    public Menu menu ;
-
+    public Vector<Jogo> jogo = new Vector();
+    public boolean replayJogo = false;
+    public int i = 0;
+    public int k = 0;
+    public Menu menu;
     public Mundo previewBoard = new Mundo(5, 5);
     public Gui componente;
     private Peca[] figures = {
@@ -31,7 +34,6 @@ public class ControladorDeJogo {
     private Ficheiros ficheiro;
     private Ranking ranking;
     //public Mundo mundo;
-    public Jogo jogo;
     public Ficheiros ficheiros;
     private Preferences prefRoot;
     private AppletContext appContext;
@@ -44,11 +46,12 @@ public class ControladorDeJogo {
     private boolean mostraPrevisaoPeca = true;
     private boolean bloqueiaMovimento = false;
     private boolean isApplet;
+    public boolean verifica;
 
     /**
      * Cria um novo jogo de Tetris. O tabuleiro tera por defaultum tamanho de 10x20.
      */
-    public ControladorDeJogo(boolean isApplet,Menu principal) {
+    public ControladorDeJogo(boolean isApplet, Menu principal) {
         this(12, 25);
         this.isApplet = isApplet;
         menu = principal;
@@ -78,8 +81,8 @@ public class ControladorDeJogo {
         board = new Mundo(width, height);
         board.setMensagem("Iniciar");
         thread = new GameThread();
-       
-        
+
+
     }
 
     public void setAppletContext(AppletContext ac) {
@@ -104,22 +107,43 @@ public class ControladorDeJogo {
      * Inicializa as variaveis do jogo antes de iniciar um jogo
      */
     public void trataArranque() {
+        if (replayJogo == false) {
+            k = 0;
+            i = 0;
+            nivel = 1;
+            pontuacao = 0;
+            peca = null;
 
-        nivel = 1;
-        pontuacao = 0;
-        peca = null;
-        pecaSeguinte = randomFigure();
-        pecaSeguinte.rotacaoRandom();
-        rotacaoSeguinte = pecaSeguinte.getRotacao();
+            pecaSeguinte = randomFigure();
+            pecaSeguinte.rotacaoRandom();
+            rotacaoSeguinte = pecaSeguinte.getRotacao();
+            jogo.addElement(new Jogo(null, 0, pecaSeguinte, rotacaoSeguinte));
+            board.setMensagem(null);
+            board.limpa();
+            previewBoard.limpa();
+            trataMudarNivel();
+            trataScore();
+            componente.button.setLabel("Pausa");
 
-        board.setMensagem(null);
-        board.limpa();
-        previewBoard.limpa();
-        trataMudarNivel();
-        trataScore();
-        componente.button.setLabel("Pausa");
+            thread.reset();
+        } else {
+            i = 0;
+            k = 0;
+            nivel = 1;
+            pontuacao = 0;
+            peca = null;
+            pecaSeguinte = jogo.elementAt(i).pecaSeguinte;
+            pecaSeguinte.setRotacao(jogo.elementAt(i).rotacaoInicialPecaSeguinte);
+            rotacaoSeguinte = pecaSeguinte.getRotacao();
+            board.setMensagem(null);
+            board.limpa();
+            previewBoard.limpa();
+            trataMudarNivel();
+            trataScore();
+            componente.button.setLabel("Pausa");
 
-        thread.reset();
+            thread.reset();
+        }
     }
 
     /**
@@ -128,7 +152,7 @@ public class ControladorDeJogo {
     public void trataFimJogo() {
 
         thread.setPaused(true);
-       
+
         if (peca != null) {
             peca.detach();
         }
@@ -137,16 +161,17 @@ public class ControladorDeJogo {
             pecaSeguinte.detach();
         }
         pecaSeguinte = null;
-        board.setMensagem("Game Over");
 
+        board.setMensagem("Game Over");
+        replayJogo = true;
+        System.out.println("TABELA :" + jogo.elementAt(0).tabela.size());
         componente.button.setLabel("Iniciar");
-        menu.pedeNome.show();
 
         trataRankingMod();
 
         if (!isApplet) {
             try {
-                prefRoot.putBoolean("ver peça seguinte", mostraPrevisaoPeca);
+                prefRoot.putBoolean("ver peÃ§a seguinte", mostraPrevisaoPeca);
                 prefRoot.flush();
             } catch (Exception ex) {
             }
@@ -191,9 +216,9 @@ public class ControladorDeJogo {
      * Modifica o ranking se necessari
      */
     public void trataRankingMod() {
-        
+
         String nome = menu.nomeTemp;
-        System.out.println("noooooooooome " +nome);
+        System.out.println("noooooooooome " + nome);
         if (ranking.inserePontuacao(pontuacao, nome)) {
             String hs = ranking.getSerializedPontuacoes();
             try {
@@ -216,26 +241,58 @@ public class ControladorDeJogo {
      */
     public void adicionaPeca() {
         int rotation;
+        if (replayJogo == false) {
+            peca = pecaSeguinte;
+            i++;
+            k = 0;
+            bloqueiaMovimento = false;
+            rotation = rotacaoSeguinte;
+            pecaSeguinte = randomFigure();
+            pecaSeguinte.rotacaoRandom();
+            rotacaoSeguinte = pecaSeguinte.getRotacao();
+            jogo.addElement(new Jogo(peca, rotation, pecaSeguinte, rotacaoSeguinte));
 
-        peca = pecaSeguinte;
-        bloqueiaMovimento = false;
-        rotation = rotacaoSeguinte;
-        pecaSeguinte = randomFigure();
-        pecaSeguinte.rotacaoRandom();
-        rotacaoSeguinte = pecaSeguinte.getRotacao();
 
-        if (mostraPrevisaoPeca) {
-            previewBoard.limpa();
-            pecaSeguinte.fundePeca(previewBoard, true);
-            pecaSeguinte.detach();
-        }
+            if (mostraPrevisaoPeca) {
+                previewBoard.limpa();
+                pecaSeguinte.fundePeca(previewBoard, true);
+                pecaSeguinte.detach();
+            }
 
-        peca.setRotacao(rotation);
-        if (!peca.fundePeca(board, false)) {
-            previewBoard.limpa();
-            peca.fundePeca(previewBoard, true);
-            peca.detach();
-            trataFimJogo();
+            peca.setRotacao(rotation);
+            if (!peca.fundePeca(board, false)) {
+                previewBoard.limpa();
+                peca.fundePeca(previewBoard, true);
+                peca.detach();
+                trataFimJogo();
+            }
+
+        } else {
+
+            i++;
+            k = 0;
+            peca = jogo.elementAt(i).peca;
+            bloqueiaMovimento = false;
+            rotation = jogo.elementAt(i).rotacaoInicialPeca;
+            pecaSeguinte = jogo.elementAt(i).pecaSeguinte;
+            pecaSeguinte.setRotacao(jogo.elementAt(i).rotacaoInicialPecaSeguinte);
+            rotacaoSeguinte = pecaSeguinte.getRotacao();
+
+            if (mostraPrevisaoPeca) {
+                previewBoard.limpa();
+                pecaSeguinte.fundePeca(previewBoard, true);
+                pecaSeguinte.detach();
+            }
+
+            peca.setRotacao(rotation);
+            if (!peca.fundePeca(board, false)) {
+                previewBoard.limpa();
+                peca.fundePeca(previewBoard, true);
+                peca.detach();
+                trataFimJogo();
+
+            }
+
         }
     }
 
@@ -298,7 +355,72 @@ public class ControladorDeJogo {
         } else if (peca.aterrou()) {
             trataFigAterrou();
         } else {
+
+            jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 0, nivel);
+            k++;
             peca.deslocarPeca(0);
+        }
+    }
+
+    public synchronized void temporizadorReplay() {
+        verifica = true;
+        if (peca == null) {
+            adicionaPeca();
+        } else {
+
+
+            while (verifica == true) {
+
+                System.out.println("i:" + i + "k:" + k);
+
+                if (jogo.elementAt(i).tabela.elementAt(k).tipo != 2) {
+                    try {
+
+
+                        if (i == 1 && k == 0) {
+
+                        } else {
+                            if (k > 0) {
+                                wait(jogo.elementAt(i).tabela.elementAt(k).temp - jogo.elementAt(i).tabela.elementAt(k - 1).temp);
+                            } else if (k == 0) {
+                                wait(jogo.elementAt(i).tabela.elementAt(k).temp - jogo.elementAt(i - 1).tabela.elementAt(jogo.elementAt(i - 1).tabela.size() - 1).temp);
+                            }
+
+                        }
+                    //wait(100);
+                    } catch (InterruptedException ex) {
+                        System.out.println("merda");
+                    }
+                    peca.deslocarPeca(jogo.elementAt(i).tabela.get(k).tipo);
+
+                } else {
+                    try {
+                        //wait(100);
+                        if (i == 1 && k == 0) {
+
+                        } else {
+                            if (k > 0) {
+                                wait(jogo.elementAt(i).tabela.elementAt(k).temp - jogo.elementAt(i).tabela.elementAt(k - 1).temp);
+                            } else if (k == 0) {
+                                wait(jogo.elementAt(i).tabela.elementAt(k).temp - jogo.elementAt(i - 1).tabela.elementAt(jogo.elementAt(i - 1).tabela.size() - 1).temp);
+                            }
+
+                        }
+                    } catch (InterruptedException ex) {
+                        System.out.println("merda");
+                    }
+                    peca.rotacao();
+
+                }
+                k++;
+                if (k > jogo.elementAt(i).tabela.size() - 1) {
+                    verifica = false;
+                    trataFigAterrou();
+
+                    k = 0;
+                }
+
+            }
         }
     }
 
@@ -310,10 +432,14 @@ public class ControladorDeJogo {
         } else {
             trataPausa();
         }
+
     }
 
     public synchronized void trataTeclaPremida(KeyEvent e) {
 
+        if (replayJogo == true) {
+            return;
+        }
         if (e.getKeyCode() == KeyEvent.VK_P) {
             trataBotao();
             return;
@@ -326,22 +452,39 @@ public class ControladorDeJogo {
         switch (e.getKeyCode()) {
 
             case KeyEvent.VK_LEFT:
+
+                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), -1, nivel);
+                k++;
                 peca.deslocarPeca(-1);
                 break;
 
             case KeyEvent.VK_RIGHT:
+
+                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 1, nivel);
+                k++;
                 peca.deslocarPeca(1);
                 break;
 
             case KeyEvent.VK_SPACE:
+
+                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 2, nivel);
+                k++;
                 peca.rotacao();
                 break;
 
             case KeyEvent.VK_UP:
+
+                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 2, nivel);
+
+                k++;
                 peca.rotacao();
                 break;
 
             case KeyEvent.VK_DOWN:
+
+                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 0, nivel);
+
+                k++;
                 peca.deslocarPeca(0);
                 break;
 
@@ -362,6 +505,7 @@ public class ControladorDeJogo {
                 }
                 break;
         }
+        System.out.println("2 PECA " + i + " exec " + k + " no instante :" + jogo.elementAt(i).tabela.elementAt(k - 1).temp);
     }
 
     /**
@@ -406,7 +550,7 @@ public class ControladorDeJogo {
         }
 
         public void run() {
-            while (thread == this) {
+            while (thread == this && replayJogo == false) {
                 temporizador();
 
                 try {
@@ -421,11 +565,27 @@ public class ControladorDeJogo {
                     }
                 }
             }
+            while (thread == this && replayJogo == true) {
+//                try {
+
+                temporizadorReplay();
+                //Thread.sleep(sleepTime);
+//                } catch (InterruptedException ignore) {
+//                }
+                while (paused && thread == this) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ignore) {
+                    }
+                }
+
+            }
+
         }
     }
 
     public void ControladorDeJogo() {
-        // TODO: implement
+    // TODO: implement
     }
 
 //    public void iniciarJogo() {
@@ -445,7 +605,7 @@ public class ControladorDeJogo {
     }
 
     public void carregarJogo() {
-        ficheiro.carregarJogo();
+    //ficheiro.carregarJogo();
     }
 
     public void inserirCodigo(int n) {
@@ -459,6 +619,6 @@ public class ControladorDeJogo {
     }
 
     public void actualizaMundo() {
-        //jogo.carregarInstante();
+    //jogo.carregarInstante();
     }
 }
