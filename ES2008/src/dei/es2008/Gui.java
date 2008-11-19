@@ -122,21 +122,20 @@ class Gui extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(0, 15, 0, 15);
         this.add(highScoreList, c);
-
         enableEvents(KeyEvent.KEY_EVENT_MASK);
         this.addKeyListener(new KeyAdapter() {
 
             public void keyPressed(KeyEvent e) {
                 controlo.trataTeclaPremida(e);
             }
-            });
+        });
         button.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 controlo.trataBotao();
                 controlo.componente.requestFocus();
             }
-            });
+        });
     }
 
     /**
@@ -168,12 +167,13 @@ class Gui extends JPanel {
         levelLabel.invalidate();
         button.invalidate();
     }
-    }
+}
 
 class Menu extends JPanel {
 
+    static int x = 0;
     Image bgImage = null;
-    //criacao dos butoes
+    //criacao dos botoes
     JButton bJogar = new JButton("Jogar");
     JButton bScore = new JButton("Highscores");
     JButton bCheats = new JButton("Xites");
@@ -196,6 +196,10 @@ class Menu extends JPanel {
     JLabel labelP3 = new JLabel("texto");
     JLabel labelP4 = new JLabel("texto");
     JLabel labelP5 = new JLabel("texto");
+    JButton bOKinserirNome = new JButton("OK");
+    JTextField textFieldNome = new JTextField("");
+    JLabel labelInserirNome = new JLabel("texto");
+
     //criacao dos icones
     Icon v1 = new ImageIcon("v1.gif");
     Icon v2 = new ImageIcon("v2.gif");
@@ -205,14 +209,18 @@ class Menu extends JPanel {
     Icon b2 = new ImageIcon("b2.gif");
     Icon c1 = new ImageIcon("c1.gif");
     Icon c2 = new ImageIcon("c2.gif");
-    static JFrame f = new JFrame("Tetris Jojo e gay");
+    static JFrame f = new JFrame("Tetris");
     static JFrame h = new JFrame("Highscores");
+    static JDialog pedeNome = new JDialog();
+
+    String nomeTemp;
     //variaveis dos nomes para os highscores
     String n1 = "---//---";
     String n2 = "---//---";
     String n3 = "---//---";
     String n4 = "---//---";
     String n5 = "---//---";
+
     //variaveis dos pontos para os highscores
     int p1 = 0;
     int p2 = 0;
@@ -220,11 +228,11 @@ class Menu extends JPanel {
     int p4 = 0;
     int p5 = 0;
     String message = "";
-    private Arranque pai;
+    public Arranque pai;
 
     public Menu(final Arranque pai) {
         super(null);
-        
+
 
         this.pai = pai;
         try {
@@ -247,10 +255,46 @@ class Menu extends JPanel {
             bMenu.setIcon(v1);
             bMenu.hide();
 
+            
+            if (x == 0) {
+                x++;
+                pedeNome.setBounds(500, 350, 200, 200);
+                pedeNome.getContentPane().setLayout(new GridLayout());
+                pedeNome.setModal(true);
+                pedeNome.hide();
+
+                bOKinserirNome.setBounds(510, 360, 5, 5);
+
+                labelInserirNome.setBounds(3000, 20, 500, 10000);
+                labelInserirNome.setText("Insira o seu nome:");
+                labelInserirNome.setFont(new Font("Serif", Font.BOLD, 10));
+
+
+                textFieldNome.setBounds(150, 15, 1, 1);
+
+                pedeNome.add(bOKinserirNome);
+                pedeNome.add(labelInserirNome);
+                pedeNome.add(textFieldNome);
+               
+                bOKinserirNome.addMouseListener(new MouseAdapter() {
+
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            nomeTemp = textFieldNome.getText();
+                            System.out.println("noooaaa: " + nomeTemp);
+                            pedeNome.hide();
+                        }
+                    }
+                });
+
+            }
+            //end
+
+
             labelNome.setText("Nome");
             labelNome.setFont(new Font("Serif", Font.BOLD, 20));
             labelNome.setBounds(150, 15, 100, 100);
-            add(labelNome);
+
             labelNome.hide();
 
             //nomes dos Highscorers
@@ -470,5 +514,4 @@ class Menu extends JPanel {
         mt.addImage(bgImage, 0);
         mt.waitForAll();
     }
-   
 }
