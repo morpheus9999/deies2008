@@ -68,6 +68,7 @@ public class ControladorDeJogo {
                 System.err.println("Impossivel ler o ranking: " + ex.getMessage());
             }
         } else {
+            
             prefRoot = Preferences.userNodeForPackage(Gui.class);
             String hs = prefRoot.get("Ranking", null);
             if (hs != null) {
