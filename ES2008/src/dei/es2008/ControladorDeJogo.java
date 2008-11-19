@@ -2,6 +2,8 @@ package dei.es2008;
 
 import java.applet.AppletContext;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -11,9 +13,10 @@ import java.util.prefs.Preferences;
 
 public class ControladorDeJogo {
 
-
-    
     public Mundo board;
+    public Arranque pai2;
+    public Menu menu = new Menu(pai2);
+
     public Mundo previewBoard = new Mundo(5, 5);
     public Gui componente;
     private Peca[] figures = {
@@ -32,11 +35,9 @@ public class ControladorDeJogo {
     public Ficheiros ficheiros;
     private Preferences prefRoot;
     private AppletContext appContext;
-    
     private GameThread thread;
     private int nivel = 1;
     private int pontuacao = 0;
-    
     private Peca peca;
     private Peca pecaSeguinte;
     private int rotacaoSeguinte = 0;
@@ -47,40 +48,41 @@ public class ControladorDeJogo {
     /**
      * Cria um novo jogo de Tetris. O tabuleiro tera por defaultum tamanho de 10x20.
      */
-    public ControladorDeJogo (boolean isApplet) {
+    public ControladorDeJogo(boolean isApplet) {
         this(12, 25);
-		this.isApplet = isApplet;
+        this.isApplet = isApplet;
 
-		ranking = new Ranking();
+        ranking = new Ranking();
 
-		if (isApplet) {
-			try {
-				InputStream is = appContext.getStream("Ranking");
-				BufferedReader br = new BufferedReader(new InputStreamReader(is));
-				ranking.setSerializedPontuacoes(br.readLine());
-				br.close();
-				is.close();
-			} catch (Exception ex) {
-				System.err.println("Impossivel ler o ranking: " + ex.getMessage());
-			}
-		} else {
-			prefRoot = Preferences.userNodeForPackage(Gui.class);
-			String hs = prefRoot.get("Ranking", null);
-			if (hs != null)
-				ranking.setSerializedPontuacoes(hs);
-			mostraPrevisaoPeca = prefRoot.getBoolean("ver peça seguinte", true);
-		}
+        if (isApplet) {
+            try {
+                InputStream is = appContext.getStream("Ranking");
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                ranking.setSerializedPontuacoes(br.readLine());
+                br.close();
+                is.close();
+            } catch (Exception ex) {
+                System.err.println("Impossivel ler o ranking: " + ex.getMessage());
+            }
+        } else {
+            prefRoot = Preferences.userNodeForPackage(Gui.class);
+            String hs = prefRoot.get("Ranking", null);
+            if (hs != null) {
+                ranking.setSerializedPontuacoes(hs);
+            }
+            mostraPrevisaoPeca = prefRoot.getBoolean("ver peça seguinte", true);
+        }
     }
 
-    public ControladorDeJogo (int width, int height) {
+    public ControladorDeJogo(int width, int height) {
         board = new Mundo(width, height);
         board.setMensagem("Iniciar");
         thread = new GameThread();
     }
 
-	public void setAppletContext (AppletContext ac) {
-		appContext = ac;
-	}
+    public void setAppletContext(AppletContext ac) {
+        appContext = ac;
+    }
 
     /**
      * mata as threads que estao a correr no jogo e faz a limpeza.
@@ -91,7 +93,7 @@ public class ControladorDeJogo {
 
     public Component getComponente() {
         if (componente == null) {
-            componente = new Gui(ranking,this);
+            componente = new Gui(ranking, this);
         }
         return componente;
     }
@@ -106,7 +108,7 @@ public class ControladorDeJogo {
         peca = null;
         pecaSeguinte = randomFigure();
         pecaSeguinte.rotacaoRandom();
-        rotacaoSeguinte = pecaSeguinte.getRotacao();  
+        rotacaoSeguinte = pecaSeguinte.getRotacao();
 
         board.setMensagem(null);
         board.limpa();
@@ -124,7 +126,7 @@ public class ControladorDeJogo {
     public void trataFimJogo() {
 
         thread.setPaused(true);
-        
+       
         if (peca != null) {
             peca.detach();
         }
@@ -133,16 +135,20 @@ public class ControladorDeJogo {
             pecaSeguinte.detach();
         }
         pecaSeguinte = null;
-
         board.setMensagem("Game Over");
+
         componente.button.setLabel("Iniciar");
+        menu.pedeNome.show();
 
-		trataRankingMod();
+        trataRankingMod();
 
-		if (! isApplet) try {
-			prefRoot.putBoolean("ver peça seguinte", mostraPrevisaoPeca);
-			prefRoot.flush();
-		} catch (Exception ex) { }
+        if (!isApplet) {
+            try {
+                prefRoot.putBoolean("ver peça seguinte", mostraPrevisaoPeca);
+                prefRoot.flush();
+            } catch (Exception ex) {
+            }
+        }
     }
 
     /**
@@ -150,7 +156,7 @@ public class ControladorDeJogo {
      */
     public void trataPausa() {
         thread.setPaused(true);
-        
+
         board.setMensagem("Pausado");
         componente.button.setLabel("Retomar");
     }
@@ -171,33 +177,35 @@ public class ControladorDeJogo {
         componente.levelLabel.setText("Nível: " + nivel);
         thread.adjustSpeed();
     }
-    
+
     /**
      * modifica a label da pontuacao.
      */
     public void trataScore() {
         componente.scoreLabel.setText("Pontos: " + pontuacao);
     }
- 
+
     /**
      * Modifica o ranking se necessari
      */
     public void trataRankingMod() {
-        String nome="MANEL";
-		if (ranking.inserePontuacao(pontuacao, nome)) {
-			String hs = ranking.getSerializedPontuacoes();
-			try {
-				if (isApplet) {
-					InputStream bais = new ByteArrayInputStream(hs.getBytes());
-					appContext.setStream("Ranking", bais);
-				} else {
-					prefRoot.put("Ranking", hs);
-					prefRoot.flush();
-				}
-			} catch (Exception ex) {
-				System.err.println("Impossível guardar a pontuação: "+ex.getMessage());
-			}
-		}
+        
+        String nome = menu.nomeTemp;
+        System.out.println("noooooooooome " +nome);
+        if (ranking.inserePontuacao(pontuacao, nome)) {
+            String hs = ranking.getSerializedPontuacoes();
+            try {
+                if (isApplet) {
+                    InputStream bais = new ByteArrayInputStream(hs.getBytes());
+                    appContext.setStream("Ranking", bais);
+                } else {
+                    prefRoot.put("Ranking", hs);
+                    prefRoot.flush();
+                }
+            } catch (Exception ex) {
+                System.err.println("Impossível guardar a pontuação: " + ex.getMessage());
+            }
+        }
     }
 
     /**
@@ -205,17 +213,17 @@ public class ControladorDeJogo {
      * cria uma nova "peca seguinte".
      */
     public void adicionaPeca() {
-        int  rotation;
+        int rotation;
 
         peca = pecaSeguinte;
         bloqueiaMovimento = false;
         rotation = rotacaoSeguinte;
         pecaSeguinte = randomFigure();
-        pecaSeguinte.rotacaoRandom(); 
-        rotacaoSeguinte = pecaSeguinte.getRotacao(); 
+        pecaSeguinte.rotacaoRandom();
+        rotacaoSeguinte = pecaSeguinte.getRotacao();
 
         if (mostraPrevisaoPeca) {
-            previewBoard.limpa(); 
+            previewBoard.limpa();
             pecaSeguinte.fundePeca(previewBoard, true);
             pecaSeguinte.detach();
         }
@@ -233,13 +241,13 @@ public class ControladorDeJogo {
      * Verifica se uma peca esta totalmente visivel, se nao estiver lanca o evento
      * de "game over".
      */
-
     public void trataFigAterrou() {
 
 
         if (peca.estaVisivel()) {
-			if (peca.numLinhasOff() > 0)
-				pontuacao += nivel * 10;
+            if (peca.numLinhasOff() > 0) {
+                pontuacao += nivel * 10;
+            }
             pontuacao += nivel * peca.numLinhasOff();
         } else {
             trataFimJogo();
@@ -247,25 +255,26 @@ public class ControladorDeJogo {
         }
         peca.detach();
         peca = null;
-		if (!mostraPrevisaoPeca)
-			pontuacao += nivel;
-		int fullLines = board.getLinhasCompletas();
+        if (!mostraPrevisaoPeca) {
+            pontuacao += nivel;
+        }
+        int fullLines = board.getLinhasCompletas();
         if (fullLines > 0) {
             board.removeLinhasCompletas();
-			switch (fullLines) {
-				case 1:
-					pontuacao += nivel * 10;
-					break;
-				case 2:
-					pontuacao += nivel * 30;
-					break;
-				case 3:
-					pontuacao += nivel * 60;
-					break;
-				case 4:
-					pontuacao += nivel * 100;
-					break;
-			}
+            switch (fullLines) {
+                case 1:
+                    pontuacao += nivel * 10;
+                    break;
+                case 2:
+                    pontuacao += nivel * 30;
+                    break;
+                case 3:
+                    pontuacao += nivel * 60;
+                    break;
+                case 4:
+                    pontuacao += nivel * 100;
+                    break;
+            }
             if (nivel < 9 && board.getLinhasRemovidas() / 20 > nivel) {
                 nivel = board.getLinhasRemovidas() / 20;
                 trataMudarNivel();
@@ -274,7 +283,7 @@ public class ControladorDeJogo {
             adicionaPeca();
         }
 
-		trataScore();
+        trataScore();
     }
 
     /**
@@ -314,42 +323,42 @@ public class ControladorDeJogo {
 
         switch (e.getKeyCode()) {
 
-        case KeyEvent.VK_LEFT:
-            peca.deslocarPeca(-1);
-            break;
+            case KeyEvent.VK_LEFT:
+                peca.deslocarPeca(-1);
+                break;
 
-        case KeyEvent.VK_RIGHT:
-            peca.deslocarPeca(1);
-            break;
-            
-        case KeyEvent.VK_SPACE:
-            peca.rotacao();
-            break;
+            case KeyEvent.VK_RIGHT:
+                peca.deslocarPeca(1);
+                break;
 
-        case KeyEvent.VK_UP:
-			peca.rotacao();
-			break;
+            case KeyEvent.VK_SPACE:
+                peca.rotacao();
+                break;
 
-        case KeyEvent.VK_DOWN:
-			peca.deslocarPeca(0);
-            break;
+            case KeyEvent.VK_UP:
+                peca.rotacao();
+                break;
 
-        case KeyEvent.VK_S:
-            if (nivel < 9) {
-                nivel++;
-                trataMudarNivel();
-            }
-            break;
+            case KeyEvent.VK_DOWN:
+                peca.deslocarPeca(0);
+                break;
 
-        case KeyEvent.VK_N:
-            mostraPrevisaoPeca = !mostraPrevisaoPeca;
-            if (mostraPrevisaoPeca && peca != pecaSeguinte) {
-                pecaSeguinte.fundePeca(previewBoard, true);
-                pecaSeguinte.detach(); 
-            } else {
-                previewBoard.limpa();
-            }
-            break;
+            case KeyEvent.VK_S:
+                if (nivel < 9) {
+                    nivel++;
+                    trataMudarNivel();
+                }
+                break;
+
+            case KeyEvent.VK_N:
+                mostraPrevisaoPeca = !mostraPrevisaoPeca;
+                if (mostraPrevisaoPeca && peca != pecaSeguinte) {
+                    pecaSeguinte.fundePeca(previewBoard, true);
+                    pecaSeguinte.detach();
+                } else {
+                    previewBoard.limpa();
+                }
+                break;
         }
     }
 
@@ -360,15 +369,14 @@ public class ControladorDeJogo {
         return figures[(int) (Math.random() * figures.length)];
     }
 
-
     /**
      * A thread de tempo de jogo
      */
     private class GameThread extends Thread {
 
- 
         private boolean paused = true;
         private int sleepTime = 500;
+
         public GameThread() {
         }
 
@@ -379,7 +387,7 @@ public class ControladorDeJogo {
                 this.start();
             }
         }
-       
+
         public boolean isPaused() {
             return paused;
         }
@@ -387,7 +395,7 @@ public class ControladorDeJogo {
         public void setPaused(boolean paused) {
             this.paused = paused;
         }
-        
+
         public void adjustSpeed() {
             sleepTime = 4500 / (nivel + 5) - 250;
             if (sleepTime < 50) {
@@ -413,23 +421,21 @@ public class ControladorDeJogo {
             }
         }
     }
-    
 
     public void ControladorDeJogo() {
         // TODO: implement
     }
-    
+
 //    public void iniciarJogo() {
 //        this.mundo=new Mundo();
 //    }
-
     public void sairJogo() {
-       System.exit(0);
+        System.exit(0);
     }
 
     public void verRanking() {
-      ficheiro.carregarRanking();
-      //assumindo que ele na classe ficheiros carrega e imprime
+        ficheiro.carregarRanking();
+    //assumindo que ele na classe ficheiros carrega e imprime
     }
 
     public void gravarJogo() {
@@ -449,7 +455,6 @@ public class ControladorDeJogo {
             //etc...
         }
     }
-
 
     public void actualizaMundo() {
         //jogo.carregarInstante();
