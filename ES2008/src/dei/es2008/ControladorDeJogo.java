@@ -19,7 +19,7 @@ public class ControladorDeJogo {
 
     public Vector<Jogo> jogo=new Vector();
     public boolean replayJogo=false;
-
+    String [] xites = {"fraco","seila","aprende","mega","ja falta pouco","falta mesmo pouco","TU ES GG"};
     public Mundo board;
     public int i = 0;
     public int k = 0;
@@ -122,7 +122,16 @@ public class ControladorDeJogo {
         if(replayJogo==false){
             k=0;
             i=0;
+            
             nivel = 1;
+            if(menu.xites==true){
+                for(int anda=0;anda<xites.length;anda++){
+                    if(menu.tXites.getText().contentEquals(xites[anda]))
+                        nivel=anda+1;
+                }
+            
+            menu.xites=false;
+            }
             pontuacao = 0;
             peca = null;
             
