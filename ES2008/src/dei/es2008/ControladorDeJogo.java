@@ -14,8 +14,8 @@ import java.util.prefs.Preferences;
 public class ControladorDeJogo {
 
     public Mundo board;
-    public Arranque pai2;
-    public Menu menu = new Menu(pai2);
+    
+    public Menu menu ;
 
     public Mundo previewBoard = new Mundo(5, 5);
     public Gui componente;
@@ -48,10 +48,10 @@ public class ControladorDeJogo {
     /**
      * Cria um novo jogo de Tetris. O tabuleiro tera por defaultum tamanho de 10x20.
      */
-    public ControladorDeJogo(boolean isApplet) {
+    public ControladorDeJogo(boolean isApplet,Menu principal) {
         this(12, 25);
         this.isApplet = isApplet;
-
+        menu = principal;
         ranking = new Ranking();
 
         if (isApplet) {
@@ -78,6 +78,8 @@ public class ControladorDeJogo {
         board = new Mundo(width, height);
         board.setMensagem("Iniciar");
         thread = new GameThread();
+       
+        
     }
 
     public void setAppletContext(AppletContext ac) {
