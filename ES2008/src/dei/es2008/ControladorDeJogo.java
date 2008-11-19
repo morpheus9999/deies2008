@@ -127,7 +127,7 @@ public class ControladorDeJogo {
             if(menu.xites==true){
                 for(int anda=0;anda<xites.length;anda++){
                     if(menu.tXites.getText().contentEquals(xites[anda]))
-                        nivel=anda+1;
+                        nivel=anda;
                 }
             
             menu.xites=false;
@@ -272,16 +272,7 @@ public class ControladorDeJogo {
             pecaSeguinte.rotacaoRandom();
             rotacaoSeguinte = pecaSeguinte.getRotacao();
             jogo.addElement(new Jogo(peca, rotation, pecaSeguinte, rotacaoSeguinte));
-        if(replayJogo==false){
-        peca = pecaSeguinte;
-        i++;
-        k=0;
-        bloqueiaMovimento = false;
-        rotation = rotacaoSeguinte;
-        pecaSeguinte = randomFigure();
-        pecaSeguinte.rotacaoRandom(); 
-        rotacaoSeguinte = pecaSeguinte.getRotacao(); 
-        jogo.addElement(new Jogo(peca,rotation,pecaSeguinte,rotacaoSeguinte));
+        
         
 
             if (mostraPrevisaoPeca) {
@@ -298,35 +289,7 @@ public class ControladorDeJogo {
                 trataFimJogo();
             }
 
-        } else {
-
-            i++;
-            k = 0;
-            peca = jogo.elementAt(i).peca;
-            bloqueiaMovimento = false;
-            rotation = jogo.elementAt(i).rotacaoInicialPeca;
-            pecaSeguinte = jogo.elementAt(i).pecaSeguinte;
-            pecaSeguinte.setRotacao(jogo.elementAt(i).rotacaoInicialPecaSeguinte);
-            rotacaoSeguinte = pecaSeguinte.getRotacao();
-
-            if (mostraPrevisaoPeca) {
-                previewBoard.limpa();
-                pecaSeguinte.fundePeca(previewBoard, true);
-                pecaSeguinte.detach();
-            }
-
-            peca.setRotacao(rotation);
-            if (!peca.fundePeca(board, false)) {
-                previewBoard.limpa();
-                peca.fundePeca(previewBoard, true);
-                peca.detach();
-                trataFimJogo();
-
-            }
-
-        }
-
-        }else{
+        } else{
 
         i++;
         k=0;
