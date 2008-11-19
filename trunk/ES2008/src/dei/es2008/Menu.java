@@ -9,9 +9,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 class Menu extends JPanel {
-
+    public boolean xites=false;
     static int x = 0;
     Image bgImage = null;
+    public int key;
     //criacao dos botoes
     JButton bJogar = new JButton("Jogar");
     JButton bScore = new JButton("Highscores");
@@ -357,11 +358,13 @@ class Menu extends JPanel {
     }
 
     private void tXitesKeyPressed(java.awt.event.KeyEvent evt) {
-        int key = evt.getKeyCode();
+      key = evt.getKeyCode();
         if (key == KeyEvent.VK_ENTER) {
 // TODO add your handling code here:
+            xites=true;
             System.out.println("ENTER pressed");
-           // metodo(tXites.getText())
+            System.out.println(tXites.getText());
+            
             
         }
 
