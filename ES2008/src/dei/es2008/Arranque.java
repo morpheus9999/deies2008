@@ -110,7 +110,7 @@ public class Arranque extends Applet {
         frame.addWindowListener(new WindowAdapter() {
 
             public void windowClosing(WindowEvent e) {
-                System.exit(0);
+                xpto.f.setVisible(true);
             }
         });
         centrarJanela(frame);

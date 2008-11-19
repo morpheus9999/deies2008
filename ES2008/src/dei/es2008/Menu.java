@@ -2,6 +2,7 @@ package dei.es2008;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.awt.image.*;
 import java.awt.event.MouseAdapter;
@@ -17,6 +18,7 @@ class Menu extends JPanel {
     JButton bCheats = new JButton("Xites");
     JButton bSair = new JButton("Sair");
     JButton bMenu = new JButton("Menu");
+    JTextField tXites = new JTextField("");
     JLabel label1 = new JLabel("texto");
     JLabel label2 = new JLabel("texto");
     JLabel label3 = new JLabel("texto");
@@ -50,7 +52,6 @@ class Menu extends JPanel {
     static JFrame f = new JFrame("Tetris");
     static JFrame h = new JFrame("Highscores");
     static JDialog pedeNome = new JDialog();
-
     String nomeTemp;
     //variaveis dos nomes para os highscores
     String n1 = "---//---";
@@ -67,6 +68,7 @@ class Menu extends JPanel {
     int p5 = 0;
     String message = "";
     public Arranque pai;
+    int xiteBoxValue = 0;
 
     public Menu(final Arranque pai) {
         super(null);
@@ -84,6 +86,9 @@ class Menu extends JPanel {
             bScore.setIcon(b1);
             bCheats.setBounds(175, 250, 150, 40);
             add(bCheats);
+            tXites.setBounds(325, 250, 75, 40);
+            add(tXites);
+            tXites.hide();
             bCheats.setIcon(c1);
             bSair.setBounds(175, 300, 150, 40);
             add(bSair);
@@ -93,7 +98,7 @@ class Menu extends JPanel {
             bMenu.setIcon(v1);
             bMenu.hide();
 
-            
+
             if (x == 0) {
                 x++;
                 pedeNome.setBounds(500, 350, 200, 200);
@@ -113,7 +118,7 @@ class Menu extends JPanel {
                 pedeNome.add(bOKinserirNome);
                 pedeNome.add(labelInserirNome);
                 pedeNome.add(textFieldNome);
-               
+
                 bOKinserirNome.addMouseListener(new MouseAdapter() {
 
                     public void mouseClicked(MouseEvent e) {
@@ -289,9 +294,26 @@ class Menu extends JPanel {
 
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
+                    tXites.setText("");
+                    if (xiteBoxValue == 0) {
+                        xiteBoxValue = 1;
+                        tXites.setVisible(true);
+                    } else {
+                        xiteBoxValue = 0;
+                        tXites.setVisible(false);
+                    }
                 }
             }
         });
+
+        tXites.addKeyListener(new java.awt.event.KeyAdapter() {
+
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tXitesKeyPressed(evt);
+            }
+        });
+
+
 
         //eventos para o Sair
         bSair.addMouseListener(new MouseAdapter() {
@@ -331,6 +353,17 @@ class Menu extends JPanel {
             }
         });
 
+
+    }
+
+    private void tXitesKeyPressed(java.awt.event.KeyEvent evt) {
+        int key = evt.getKeyCode();
+        if (key == KeyEvent.VK_ENTER) {
+// TODO add your handling code here:
+            System.out.println("ENTER pressed");
+           // metodo(tXites.getText())
+            
+        }
 
     }
 
