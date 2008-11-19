@@ -15,7 +15,7 @@ import javax.swing.UnsupportedLookAndFeelException;
  * É a classe main do jogo.
  */
 public class Arranque extends Applet {
-    
+    public Menu xpto;
     int x=0;
 
     public static void main(String[] args) {
@@ -34,7 +34,7 @@ public class Arranque extends Applet {
     private ControladorDeJogo game;
 
     public Arranque() {
-        Menu xpto = new Menu(this);
+        xpto = new Menu(this);
         xpto.f.setBounds(10, 10, 500, 400);
         xpto.f.getContentPane().setLayout(new GridLayout());
         xpto.f.getContentPane().add(xpto);
@@ -93,7 +93,7 @@ public class Arranque extends Applet {
     public void iniciarJogo() {
 
         JFrame frame = new JFrame("Tetris");
-        game = new ControladorDeJogo(false);
+        game = new ControladorDeJogo(false,xpto);
         frame.add(game.getComponente());
         frame.pack();
         frame.addWindowListener(new WindowAdapter() {
@@ -129,7 +129,7 @@ public class Arranque extends Applet {
      */
     public void init() {
 
-        game = new ControladorDeJogo(true);
+        game = new ControladorDeJogo(true,xpto);
         game.setAppletContext(getAppletContext());
 
         setLayout(new BorderLayout());
