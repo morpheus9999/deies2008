@@ -1,6 +1,5 @@
 package dei.es2008;
 
-import java.io.*;
 import java.util.*;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
@@ -63,7 +62,7 @@ public class Ranking implements ListModel {
 			sb.append(",").append(dt.getYear());
 			sb.append(",").append(dt.getMonth());
 			sb.append(",").append(dt.getDate());
-                        sb.append(",").append(sc.getNome());
+            sb.append(",").append(sc.getNome());
 		}
 		return sb.toString();
 	}
@@ -77,7 +76,7 @@ public class Ranking implements ListModel {
 						new Date(Integer.parseInt(parts[i+1]),
 								Integer.parseInt(parts[i+2]),
 								Integer.parseInt(parts[i+3])),
-                                                                parts[i+4]));
+                           parts[i+4]));
 		}
 	}
 
@@ -119,19 +118,19 @@ public class Ranking implements ListModel {
 	private class Pontuacao {
 		int pontuacao;
 		Date data;
-                String Nome;
+        String Nome;
 
 		public Pontuacao (int pontuacao, Date data, String Nome) {
 			this.pontuacao = pontuacao;
 			this.data = data;
-                        this.Nome = Nome;
+            this.Nome = Nome;
 		}
 
 		public int getPontuacao() { return pontuacao; }
 
 		public Date getData() { return data; }
                 
-                public String getNome() { return Nome; }
+        public String getNome() { return Nome; }
 	}
 }
 

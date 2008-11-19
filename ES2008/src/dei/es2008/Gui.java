@@ -41,12 +41,14 @@ class Gui extends JPanel {
     /**
      * Metodo que pinta as componentes do jogo.
      */
+
     public void paintComponent(Graphics g) {
         Rectangle rect = g.getClipBounds();
 
         if (size == null || !size.equals(getSize())) {
             size = getSize();
             redimensionaComponentes();
+
         }
         g.setColor(getBackground());
         g.fillRect(rect.x, rect.y, rect.width, rect.height);

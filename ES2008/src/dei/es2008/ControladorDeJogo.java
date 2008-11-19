@@ -9,19 +9,24 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import java.util.Vector;
+
 import java.util.prefs.Preferences;
 
 public class ControladorDeJogo {
 
+
+    public Vector<Jogo> jogo=new Vector();
+    public boolean replayJogo=false;
+
     public Mundo board;
-    public Vector<Jogo> jogo = new Vector();
-    public boolean replayJogo = false;
     public int i = 0;
     public int k = 0;
     public Menu menu;
     public Mundo previewBoard = new Mundo(5, 5);
     public Gui componente;
+
     private Peca[] figures = {
         new Peca(Peca.QUADRADO),
         new Peca(Peca.LINHA),
@@ -34,6 +39,8 @@ public class ControladorDeJogo {
     private Ficheiros ficheiro;
     private Ranking ranking;
     //public Mundo mundo;
+
+
     public Ficheiros ficheiros;
     private Preferences prefRoot;
     private AppletContext appContext;
@@ -46,7 +53,9 @@ public class ControladorDeJogo {
     private boolean mostraPrevisaoPeca = true;
     private boolean bloqueiaMovimento = false;
     private boolean isApplet;
-    public boolean verifica;
+    private boolean verifica;
+
+
 
     /**
      * Cria um novo jogo de Tetris. O tabuleiro tera por defaultum tamanho de 10x20.
@@ -56,6 +65,7 @@ public class ControladorDeJogo {
         this.isApplet = isApplet;
         menu = principal;
         ranking = new Ranking();
+
 
         if (isApplet) {
             try {
@@ -76,6 +86,7 @@ public class ControladorDeJogo {
             }
             mostraPrevisaoPeca = prefRoot.getBoolean("ver peça seguinte", true);
         }
+
     }
 
     public ControladorDeJogo(int width, int height) {
@@ -108,17 +119,17 @@ public class ControladorDeJogo {
      * Inicializa as variaveis do jogo antes de iniciar um jogo
      */
     public void trataArranque() {
-        if (replayJogo == false) {
-            k = 0;
-            i = 0;
+        if(replayJogo==false){
+            k=0;
+            i=0;
             nivel = 1;
             pontuacao = 0;
             peca = null;
-
+            
             pecaSeguinte = randomFigure();
             pecaSeguinte.rotacaoRandom();
             rotacaoSeguinte = pecaSeguinte.getRotacao();
-            jogo.addElement(new Jogo(null, 0, pecaSeguinte, rotacaoSeguinte));
+            jogo.addElement(new Jogo(null,0,pecaSeguinte,rotacaoSeguinte));
             board.setMensagem(null);
             board.limpa();
             previewBoard.limpa();
@@ -127,22 +138,22 @@ public class ControladorDeJogo {
             componente.button.setLabel("Pausa");
 
             thread.reset();
-        } else {
-            i = 0;
-            k = 0;
-            nivel = 1;
+        }else{
+            i=0;
+            k=0;
+            nivel= 1;
             pontuacao = 0;
-            peca = null;
-            pecaSeguinte = jogo.elementAt(i).pecaSeguinte;
+            peca=null;
+            pecaSeguinte=jogo.elementAt(i).pecaSeguinte;
             pecaSeguinte.setRotacao(jogo.elementAt(i).rotacaoInicialPecaSeguinte);
-            rotacaoSeguinte = pecaSeguinte.getRotacao();
+            rotacaoSeguinte=pecaSeguinte.getRotacao();
             board.setMensagem(null);
             board.limpa();
             previewBoard.limpa();
             trataMudarNivel();
             trataScore();
             componente.button.setLabel("Pausa");
-
+            
             thread.reset();
         }
     }
@@ -164,8 +175,8 @@ public class ControladorDeJogo {
         pecaSeguinte = null;
 
         board.setMensagem("Game Over");
-        replayJogo = true;
-        System.out.println("TABELA :" + jogo.elementAt(0).tabela.size());
+        replayJogo=true;
+        System.out.println("TABELA :"+jogo.elementAt(0).tabela.size());
         componente.button.setLabel("Iniciar");
 
         trataRankingMod();
@@ -231,7 +242,7 @@ public class ControladorDeJogo {
                     prefRoot.flush();
                 }
             } catch (Exception ex) {
-                System.err.println("Impossível guardar a pontuação: " + ex.getMessage());
+                System.err.println("Imposs√≠vel guardar a pontua√ß√£o: " + ex.getMessage());
             }
         }
     }
@@ -252,7 +263,17 @@ public class ControladorDeJogo {
             pecaSeguinte.rotacaoRandom();
             rotacaoSeguinte = pecaSeguinte.getRotacao();
             jogo.addElement(new Jogo(peca, rotation, pecaSeguinte, rotacaoSeguinte));
-
+        if(replayJogo==false){
+        peca = pecaSeguinte;
+        i++;
+        k=0;
+        bloqueiaMovimento = false;
+        rotation = rotacaoSeguinte;
+        pecaSeguinte = randomFigure();
+        pecaSeguinte.rotacaoRandom(); 
+        rotacaoSeguinte = pecaSeguinte.getRotacao(); 
+        jogo.addElement(new Jogo(peca,rotation,pecaSeguinte,rotacaoSeguinte));
+        
 
             if (mostraPrevisaoPeca) {
                 previewBoard.limpa();
@@ -294,6 +315,34 @@ public class ControladorDeJogo {
 
             }
 
+        }
+
+        }else{
+
+        i++;
+        k=0;
+        peca = jogo.elementAt(i).peca;
+        bloqueiaMovimento = false;
+        rotation = jogo.elementAt(i).rotacaoInicialPeca;
+        pecaSeguinte = jogo.elementAt(i).pecaSeguinte;
+        pecaSeguinte.setRotacao(jogo.elementAt(i).rotacaoInicialPecaSeguinte);
+        rotacaoSeguinte = pecaSeguinte.getRotacao();
+
+        if (mostraPrevisaoPeca) {
+            previewBoard.limpa();
+            pecaSeguinte.fundePeca(previewBoard, true);
+            pecaSeguinte.detach();
+        }
+
+        peca.setRotacao(rotation);
+        if (!peca.fundePeca(board, false)) {
+            previewBoard.limpa();
+            peca.fundePeca(previewBoard, true);
+            peca.detach();
+            trataFimJogo();
+
+        }
+        
         }
     }
 
@@ -356,72 +405,72 @@ public class ControladorDeJogo {
         } else if (peca.aterrou()) {
             trataFigAterrou();
         } else {
-
-            jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 0, nivel);
+            
+                jogo.elementAt(i).guardarInstante( System.currentTimeMillis(),0, nivel);
             k++;
             peca.deslocarPeca(0);
         }
     }
 
     public synchronized void temporizadorReplay() {
-        verifica = true;
+        verifica=true;
         if (peca == null) {
             adicionaPeca();
-        } else {
+        }  else {
+            
+            
+        while(verifica==true){
+            
+            System.out.println("i:"+i+"k:"+k);
+            
+            if(jogo.elementAt(i).tabela.elementAt(k).tipo!=2){
+                try {
+                    
 
+                    if(i== 1 && k==0){
 
-            while (verifica == true) {
-
-                System.out.println("i:" + i + "k:" + k);
-
-                if (jogo.elementAt(i).tabela.elementAt(k).tipo != 2) {
-                    try {
-
-
-                        if (i == 1 && k == 0) {
-
-                        } else {
-                            if (k > 0) {
-                                wait(jogo.elementAt(i).tabela.elementAt(k).temp - jogo.elementAt(i).tabela.elementAt(k - 1).temp);
-                            } else if (k == 0) {
-                                wait(jogo.elementAt(i).tabela.elementAt(k).temp - jogo.elementAt(i - 1).tabela.elementAt(jogo.elementAt(i - 1).tabela.size() - 1).temp);
-                            }
-
+                    }else{
+                        if(k>0)
+                            wait(jogo.elementAt(i).tabela.elementAt(k).temp-jogo.elementAt(i).tabela.elementAt(k-1).temp);
+                        else if(k==0){
+                            wait(jogo.elementAt(i).tabela.elementAt(k).temp-jogo.elementAt(i-1).tabela.elementAt(jogo.elementAt(i-1).tabela.size()-1).temp);
                         }
+
+                    }
                     //wait(100);
-                    } catch (InterruptedException ex) {
-                        System.out.println("merda");
-                    }
-                    peca.deslocarPeca(jogo.elementAt(i).tabela.get(k).tipo);
+                } catch (InterruptedException ex) {
+                    System.out.println("merda");
+                }
+                peca.deslocarPeca(jogo.elementAt(i).tabela.get(k).tipo);
 
-                } else {
-                    try {
-                        //wait(100);
-                        if (i == 1 && k == 0) {
+            }else{
+                try {
+                    //wait(100);
+                    if(i== 1 && k==0){
 
-                        } else {
-                            if (k > 0) {
-                                wait(jogo.elementAt(i).tabela.elementAt(k).temp - jogo.elementAt(i).tabela.elementAt(k - 1).temp);
-                            } else if (k == 0) {
-                                wait(jogo.elementAt(i).tabela.elementAt(k).temp - jogo.elementAt(i - 1).tabela.elementAt(jogo.elementAt(i - 1).tabela.size() - 1).temp);
-                            }
-
+                    }else{
+                        if(k>0)
+                            wait(jogo.elementAt(i).tabela.elementAt(k).temp-jogo.elementAt(i).tabela.elementAt(k-1).temp);
+                        else if(k==0){
+                            wait(jogo.elementAt(i).tabela.elementAt(k).temp-jogo.elementAt(i-1).tabela.elementAt(jogo.elementAt(i-1).tabela.size()-1).temp);
                         }
-                    } catch (InterruptedException ex) {
-                        System.out.println("merda");
+
                     }
-                    peca.rotacao();
-
+                } catch (InterruptedException ex) {
+                    System.out.println("merda");
                 }
-                k++;
-                if (k > jogo.elementAt(i).tabela.size() - 1) {
-                    verifica = false;
-                    trataFigAterrou();
-
-                    k = 0;
-                }
+                peca.rotacao();
 
             }
+            k++;
+            if(k>jogo.elementAt(i).tabela.size()-1){
+                        verifica=false;
+                        trataFigAterrou();
+                
+                k=0;
+                }
+
+                }
         }
     }
 
@@ -438,9 +487,8 @@ public class ControladorDeJogo {
 
     public synchronized void trataTeclaPremida(KeyEvent e) {
 
-        if (replayJogo == true) {
+        if(replayJogo==true)
             return;
-        }
         if (e.getKeyCode() == KeyEvent.VK_P) {
             trataBotao();
             return;
@@ -452,42 +500,43 @@ public class ControladorDeJogo {
 
         switch (e.getKeyCode()) {
 
-            case KeyEvent.VK_LEFT:
+        case KeyEvent.VK_LEFT:
+            
+                jogo.elementAt(i).guardarInstante( System.currentTimeMillis(),-1, nivel);
+            k++;
+            peca.deslocarPeca(-1);
+            break;
 
-                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), -1, nivel);
+        case KeyEvent.VK_RIGHT:
+            
+                jogo.elementAt(i).guardarInstante( System.currentTimeMillis(),1, nivel);
+            k++;
+            peca.deslocarPeca(1);
+            break;
+            
+        case KeyEvent.VK_SPACE:
+            
+                jogo.elementAt(i).guardarInstante( System.currentTimeMillis(),2, nivel);
+            k++;
+            peca.rotacao();
+            break;
+
+        case KeyEvent.VK_UP:
+            
+                jogo.elementAt(i).guardarInstante( System.currentTimeMillis(),2, nivel);
+            
+            k++;
+			peca.rotacao();
+			break;
+
+        case KeyEvent.VK_DOWN:
+            
+                jogo.elementAt(i).guardarInstante( System.currentTimeMillis(),0, nivel);
+            
                 k++;
-                peca.deslocarPeca(-1);
-                break;
+			peca.deslocarPeca(0);
+            break;
 
-            case KeyEvent.VK_RIGHT:
-
-                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 1, nivel);
-                k++;
-                peca.deslocarPeca(1);
-                break;
-
-            case KeyEvent.VK_SPACE:
-
-                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 2, nivel);
-                k++;
-                peca.rotacao();
-                break;
-
-            case KeyEvent.VK_UP:
-
-                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 2, nivel);
-
-                k++;
-                peca.rotacao();
-                break;
-
-            case KeyEvent.VK_DOWN:
-
-                jogo.elementAt(i).guardarInstante(System.currentTimeMillis(), 0, nivel);
-
-                k++;
-                peca.deslocarPeca(0);
-                break;
 
             case KeyEvent.VK_S:
                 if (nivel < 9) {
@@ -506,7 +555,7 @@ public class ControladorDeJogo {
                 }
                 break;
         }
-        System.out.println("2 PECA " + i + " exec " + k + " no instante :" + jogo.elementAt(i).tabela.elementAt(k - 1).temp);
+        System.out.println("2 PECA "+i+" exec "+k+" no instante :"+jogo.elementAt(i).tabela.elementAt(k-1).temp);
     }
 
     /**
@@ -551,7 +600,7 @@ public class ControladorDeJogo {
         }
 
         public void run() {
-            while (thread == this && replayJogo == false) {
+            while (thread == this && replayJogo==false) {
                 temporizador();
 
                 try {
@@ -566,9 +615,9 @@ public class ControladorDeJogo {
                     }
                 }
             }
-            while (thread == this && replayJogo == true) {
+            while(thread==this && replayJogo==true){
 //                try {
-
+                    
                 temporizadorReplay();
                 //Thread.sleep(sleepTime);
 //                } catch (InterruptedException ignore) {
@@ -579,9 +628,8 @@ public class ControladorDeJogo {
                     } catch (InterruptedException ignore) {
                     }
                 }
-
+                
             }
-
         }
     }
 
@@ -602,11 +650,11 @@ public class ControladorDeJogo {
     }
 
     public void gravarJogo() {
-        ficheiro.gravarJogo(jogo);
+        //ficheiro.gravarJogo(jogo);
     }
 
     public void carregarJogo() {
-    //ficheiro.carregarJogo();
+       // ficheiro.carregarJogo();
     }
 
     public void inserirCodigo(int n) {
@@ -620,6 +668,6 @@ public class ControladorDeJogo {
     }
 
     public void actualizaMundo() {
-    //jogo.carregarInstante();
+        //jogo.carregarInstante();
     }
 }

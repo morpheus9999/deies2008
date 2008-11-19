@@ -7,9 +7,17 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+
+
 
 /**
  * É a classe main do jogo.
@@ -18,7 +26,10 @@ public class Arranque extends Applet {
     public Menu xpto;
     int x=0;
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args)  {
+    
+
         try {
             // Set System L&F
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -128,8 +139,19 @@ public class Arranque extends Applet {
      * Inicia a applet do jogo.
      */
     public void init() {
+        try {
 
-        game = new ControladorDeJogo(true,xpto);
+
+game = new ControladorDeJogo(true,xpto);
+
+            
+        } catch (Exception e){
+            
+        }
+            
+        
+        
+
         game.setAppletContext(getAppletContext());
 
         setLayout(new BorderLayout());
